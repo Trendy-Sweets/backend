@@ -1,9 +1,5 @@
-import express from "express";
-
+import { connDB } from '../../index.js';
 class sloganClass {
-    constructor(conndb) {
-      this.conndb = conndb;
-    }
   
     async getSlogan() {
       try {
@@ -14,7 +10,7 @@ class sloganClass {
           rowMode: '' //'array',
         }
 
-        const result = await this.conndb.query(query);
+        const result = await connDB.query(query);
                       
         console.log('GET RANDOM slogan result = ' + result.rows[0].slogan_text);
 
@@ -27,12 +23,4 @@ class sloganClass {
     }
   }
   
-  export default sloganClass;
-  
-
-
-
-/*exports.getRandomSlogan = function () {
-    const slogan = 'подаруй насолоду';
-    return slogan;
-  };*/ 
+  export default new sloganClass();
