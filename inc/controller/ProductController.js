@@ -1,4 +1,3 @@
-import { connDB } from '../../index_serv.js';
 import productClass from '../class/productClass.js';
 import sloganClass from '../class/sloganClass.js';
 
@@ -7,16 +6,8 @@ class ProductController {
     async getMainPage(req, res) {
         console.log('get main page ...');
         try {
-            const slogan = new sloganClass(connDB);
-            console.log('create slogan class');
-            const result = await slogan.getSlogan();
-            console.log('Get result ... ok')
-        
-            const product = new productClass(connDB);
-            console.log('create PRODUCt clas');
-            const products = await product.getProductGroup_list();
-            console.log('Get result ... ok')
-    
+            const result = await sloganClass.getSlogan();
+            const products = await productClass.getProductGroup_list();
             const klient_arr = [];
             
             const tosend = {
@@ -27,6 +18,22 @@ class ProductController {
         
             res.json(tosend);
             
+        } catch (error) {
+            console.log(error);
+            res.status(500).json(error);
+        }
+    }
+
+    async getProdctGroupInfo(req, res) {
+        try {
+            const {idGroup} = req.params;
+            console.log('ProdctGroup Page. IdGroup = ' + idGroup);
+            const productGroup = await productClass.getProductGroupInfo(idGroup);
+            
+            console.log('productGroup - ' + productGroup);
+            res.json(productGroup);
+
+
         } catch (error) {
             console.log(error);
             res.status(500).json(error);
