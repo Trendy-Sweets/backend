@@ -5,7 +5,7 @@ const router = new Router;
 
 router.get('/', ProductController.getMainPage);
 
-router.get('/sweet/:id');
+router.get('/sweet/:idGroup', ProductController.getProdctGroupInfo);
 
 router.get('/register');
 router.post('/register');
