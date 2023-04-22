@@ -1,9 +1,6 @@
-import pg from 'pg'
-
+import { connDB } from '../../index.js';
 class productClass {
-    constructor(conndb) {
-      this.conndb = conndb;
-    }
+    
   
     async getProductGroup_list() {
       try {
@@ -14,7 +11,7 @@ class productClass {
           rowMode: 'object' //'array',
         }
 
-        const result = await this.conndb.query(query);
+        const result = await connDB.query(query);
         const toReturn = [];
 
         for (const row of result.rows) {
@@ -84,9 +81,28 @@ class productClass {
         return 'Error getting slogan';
       }
     }
+
+    async getProductGroupInfo(idGroup){
+      try {
+        const query = {
+          text: 'SELECT * FROM product LEFT JOIN productgroup_list  ON productgroup_list.productgroup_id = product.productgroupid  WHERE product.productgroupid = '+ idGroup + '  ORDER BY productgroup_list.productgroup_id ASC; ',
+          values: '',
+          rowMode: 'object' //'array',
+        }
+        console.log('SQL - '+ query.text);
+
+        const result = await connDB.query(query);
+
+        return result;
+
+      } catch (error) {
+        console.log(error);
+        return {message:' error by get Group Sweets Information'}
+      }
+    }
   }
   
-  export default productClass;
+  export default  new productClass();
 
 
   
