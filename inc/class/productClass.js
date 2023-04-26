@@ -77,8 +77,7 @@ class productClass {
         return toReturn; //result.rows;  //.rows[0].slogan_text;
         
       } catch (error) {
-        console.error(error);
-        return 'Error getting slogan';
+        throw new error('Error getting ProductGroups List - '+error );
       }
     }
 
@@ -96,8 +95,8 @@ class productClass {
         return result;
 
       } catch (error) {
-        console.log(error);
-        return {message:' error by get Group Sweets Information'}
+        throw new error(' error by get Group Sweets Information - '+error );
+       
       }
     }
   }
