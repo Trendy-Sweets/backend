@@ -5,10 +5,9 @@ class OrderController {
     // загрузка данных о товарах в корзине
     async getCartProductInfo(req, res) {
         try {
-            const {ProductIdList,ProductCountList} = req.params;
-          
+            //const {ProductIdList,ProductCountList} = req.params;
+            console.log('I AM WORK');
             res.json('Данные о товарах в корзине');
-
 
         } catch (error) {
             console.log(error);
@@ -24,7 +23,6 @@ class OrderController {
           
             res.json('оформляем заказ и сохрпаняем его в БД');
 
-
         } catch (error) {
             console.log(error);
             res.status(500).json(error.message);
@@ -37,7 +35,6 @@ class OrderController {
             const {idOrder} = req.params;
           
             res.json('статус заказа с номером - '+idOrder);
-
 
         } catch (error) {
             console.log(error);
@@ -52,7 +49,6 @@ class OrderController {
           
             res.json('статус оплаты заказа номером - '+idOrder);
 
-
         } catch (error) {
             console.log(error);
             res.status(500).json(error.message);
@@ -66,15 +62,11 @@ class OrderController {
           
             res.json('Обновили статус оплаты заказа № ' + idOrder);
 
-
         } catch (error) {
             console.log(error);
             res.status(500).json(error.message);
         }
     }
-    
-    
 }
-
 
 export default new OrderController();

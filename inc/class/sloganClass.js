@@ -12,7 +12,7 @@ class sloganClass {
 
         const result = await connDB.query(query);
                       
-        console.log('GET RANDOM slogan result = ' + result.rows[0].slogan_text);
+        //console.log('GET RANDOM slogan result = ' + result.rows[0].slogan_text);
 
         return result.rows[0].slogan_text;
         
