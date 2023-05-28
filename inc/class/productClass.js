@@ -1,23 +1,17 @@
-import pg from 'pg'
-
+import { connDB } from '../../index.js';
 class productClass {
-    constructor(conndb) {
-      this.conndb = conndb;
-    }
-  
     async getProductGroup_list() {
       try {
-
         const query = {
           text: 'SELECT * FROM product LEFT JOIN productgroup_list  ON productgroup_list.productgroup_id = product.productgroupid  WHERE productgroup_list.status_public = 1  ORDER BY productgroup_list.productgroup_id ASC; ',
           values: '',
           rowMode: 'object' //'array',
         }
 
-        const result = await this.conndb.query(query);
+        const temp = await connDB.query(query);
         const toReturn = [];
 
-        for (const row of result.rows) {
+        for (const row of temp.rows) {
           const {
             productid,
             productgroupid,
@@ -73,20 +67,136 @@ class productClass {
               productColor: product_color
           });
         }
+        //console.log('Product list | result = ' + toReturn[0]);
 
+        const result = {
+          msg : "ok",
+          toReturn: toReturn,
+          error: "",
+        }
 
-        console.log('Product list | result = ' + toReturn[0]);
-
-        return toReturn; //result.rows;  //.rows[0].slogan_text;
+        return result;
         
-      } catch (error) {
-        console.error(error);
-        return 'Error getting slogan';
+      } catch (err) {
+
+          const result = {
+            msg: "error",
+            toReturn: "",
+            error: 'Error getting ProductGroups List - ' + error,
+          };
+      }
+    }
+  // ***** Данные о конкретном виде продукта *********
+    async getProductGroupInfo(idGroup){
+      try {
+
+        let temp;
+        let result_group = {};
+
+        const query_group = {
+          text: 'SELECT * FROM productgroup_list WHERE productgroup_id = $1;',
+          values: [idGroup],
+          rowMode: 'object'
+        };
+
+        temp  = await connDB.query(query_group);
+
+        if (temp.rowCount == 1)
+        {
+          result_group.msg = "ok";
+          result_group = temp.rows[0];
+
+          const result = {
+            msg:"ok",
+            error: "",
+            toReturn: result_group,
+          }
+          //console.dir(result, { depth: null });
+
+          return result; 
+        }
+        else
+        {
+          const result = {
+            msg:"error",
+            error: "Not exist data",
+            toReturn: result_group,
+          };
+          return result; 
+        }
+       
+      } catch (err) {
+
+        const result = {
+          msg:"error",
+          toReturn: "",
+          error: err,
+        }
+        
+        return result;
+      }
+    }
+
+    // **** данные о вариациях продукта для конкретной группы *******
+    async getProductsListInGroup(idGroup)
+    {
+      try
+      {
+        let result_list = [];
+
+        const query_list = {
+          text: 'SELECT * FROM product WHERE productgroupid = $1 AND status_public = true;',
+          values: [idGroup],
+          rowMode: 'object'
+        }
+
+        let temp = await connDB.query(query_list);
+       
+          if (temp.rowCount > 0 )
+          {
+            for (const row of temp.rows) {
+
+              result_list.push({
+                productid:            row.productid,
+                productgroupid:       row.productgroupid,
+                product_name:         row.product_name,
+                product_price:        row.product_price,
+                product_foto:         row.product_foto,
+                product_composition:  row.product_composition,
+                date_create:          row.date_create,
+                date_lastupdate:      row.date_lastupdate,
+                product_color:        row.product_color,
+              }); 
+            }
+            
+            const result = {
+              msg:"ok",
+              toReturn: result_list,
+              error: "",
+            };
+            console.dir(result, { depth: null });
+            return result;
+            //console.dir(result, { depth: null });
+          }
+          else
+          {
+            const result = {
+              msg:"error",
+              toReturn: "",
+              error: "Error. Not isset content",
+            };
+            return result;
+          }
+      }
+      catch(err) {
+        const result = {
+          msg:"error",
+          toReturn: "",
+          error: err,
+        };
+        return result;
       }
     }
   }
   
-  export default productClass;
-
-
-  
+  export default  new productClass();
