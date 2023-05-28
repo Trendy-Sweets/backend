@@ -2,6 +2,8 @@ import config from './config.json' assert { type: "json" };
 import express, { json } from 'express';
 import pg from 'pg';
 import router from './inc/router/ProductRouter.js';
+import cookieParser from 'cookie-parser';
+
 
 
 const PORT = config.PORT;
@@ -11,7 +13,9 @@ export { connDB };
 
 const app = express();
 app.use(express.json());//что бы экспресс мог понят json формат
+app.use(cookieParser());
 app.use('/api', router);
+
 
 async function startBackend(){
     try {
