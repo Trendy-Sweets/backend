@@ -1,14 +1,31 @@
 import productClass from '../class/productClass.js';
 import sloganClass from '../class/sloganClass.js';
+import clientClass from '../class/clientClass.js';
 
 class ProductController {
     async getMainPage(req, res) {
         console.log('get main page ...');
         try {
+        
             const result = await sloganClass.getSlogan();
             const products = await productClass.getProductGroup_list();
-            const klient_arr = [];
+            const klient_arr = {
+                "IsLogin": clientClass.IsLogin,
+                "clientId": clientClass.userIdNow
+            };
             
+            var error = false;
+            var errorMSG = "";
+            if (!result) 
+            {
+                error = true;
+                errorMSG = "Problem in Get Slogan";
+            }
+            if (products.msg !="ok")
+            {
+                error = true;
+                errorMSG = products.error;
+            }
             // if products.msg == "ok" - то все хорошо
             // если  .msg ==  error  - то были проблемы с получением данных
             // текст ошибки лежит в products.error
@@ -26,6 +43,8 @@ class ProductController {
             res.status(500).json(error.message);
         }
     }
+
+
     // страница просмотра конкретного товара - данные о товаре
     async getProdctGroupInfo(req, res) {
         try {

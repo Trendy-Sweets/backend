@@ -18,7 +18,7 @@ class sloganClass {
         
       } catch (error) {
         console.error(error);
-        return 'Error getting slogan';
+        return false;
       }
     }
   }

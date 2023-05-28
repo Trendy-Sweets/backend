@@ -1,6 +1,12 @@
 import { connDB } from '../../index.js';
 class clientClass {
   
+  constructor() {
+    this.IsLogin = false;   // если True - значит авторизован
+    this.userIdNow = null; // тут будет id usera если он авторизован
+  }
+
+
     async autoresetionUser() {
       try {
 

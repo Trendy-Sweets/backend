@@ -5,6 +5,16 @@ class OrderController {
     // загрузка данных о товарах в корзине
     async getCartProductInfo(req, res) {
         try {
+// просмотр корзины товаров
+// взять данные из куки - {id:count; id:count}
+// возврат массив сведений о товаре согласно дизайну
+
+// отдельно суммарная стоимость корзины 
+
+
+// кфото превью товара главного группы и товарных вариаций
+
+
             //const {ProductIdList,ProductCountList} = req.params;
             console.log('I AM WORK');
             res.json('Данные о товарах в корзине');

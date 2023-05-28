@@ -1,7 +1,35 @@
 import clientClass from '../class/clientClass.js';
+import { parse } from 'cookie';
 
 class ClientController {
    
+    async checkAuthorization(cookies) { // проверяем авторизацию по куки ts_login
+        try {
+          if (!cookies.ts_login) {
+            clientClass.IsLogin = false;
+            clientClass.userIdNow = null;
+            return false;
+          }
+          // ts_login={"id": 2}; Path=/;
+          const cookieValue = JSON.parse(cookies.ts_login);
+          
+          if (cookieValue.id === false) {
+            clientClass.IsLogin = false;
+            clientClass.userIdNow = null;
+            return false;
+          }
+    
+          if (typeof cookieValue.id === 'number') {
+            clientClass.IsLogin = true;
+            clientClass.userIdNow = cookieValue.id;
+            return true;
+          }
+        } catch (error) {
+          console.error(error);
+          return 'Error in clientClass';
+        }
+      }
+
     async postLogIn(req, res) {
         try {
             const {Login,Password} = req.params;
@@ -43,6 +71,7 @@ class ClientController {
         try {
             const {Login,Password,Email,FirstName,LastName, Phone} = req.params;
           
+            // result = { namePole : "string otvet"}
             res.json('Регистрация пользователя');
 
 
