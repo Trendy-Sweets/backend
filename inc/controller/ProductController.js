@@ -43,9 +43,54 @@ class ProductController {
             res.status(500).json(error.message);
         }
     }
+    // Страница товара (новый вариант)
+    // Выводим инфу о товара с его айдишником и сопровождаем массивов других вариаций товарв из его группы
+    async getProductInfoById(req, res)
+    {
+        try {
+            const {idProduct} = req.params;
+            console.log('idProduct = '+ idProduct);
+            const temp_productInfo = await productClass.getProductInfoById(idProduct);
+            
+            
+            var tosend = {};
 
 
-    // страница просмотра конкретного товара - данные о товаре
+            if (temp_productInfo.msg == 'ok')
+            {
+                
+                // получем список других товаров из этой же группы
+                //console.log('nomer category =  '+temp_productInfo.toReturn.groupid);
+                const temp_list  = await productClass.getProductsListInGroup(temp_productInfo.toReturn.groupid);
+                
+                tosend = {
+                    prtoductInfo: temp_productInfo.toReturn,
+                    products: temp_list.toReturn, //array
+                    error: false,
+                    errorMSG: "",
+                };
+                
+                res.json(tosend);
+
+            }
+            else
+            {
+                tosend = {
+                    prtoductInfo: {},
+                    products: {}, 
+                    error: true,
+                    errorMSG: temp_productInfo.error,
+                };
+               res.json(tosend)
+            }
+            
+            
+        } catch (error) {
+            console.log(error);
+            res.status(500).json(error.message);
+        }
+    }
+    // Старый вариант, когда выводли инфу о группе ---- страница просмотра конкретного товара - данные о товаре
     async getProdctGroupInfo(req, res) {
         try {
             const {idGroup} = req.params;
@@ -66,12 +111,12 @@ class ProductController {
                 error: false,
             };
 
-            console.log('productGroup - ' + tosend.groupInfo);
+            //console.log('productGroup - ' + tosend.groupInfo);
             res.json(tosend);
 
 
         } catch (error) {
-            console.log(error);
+            //console.log(error);
             res.status(500).json(error.message);
         }
     }

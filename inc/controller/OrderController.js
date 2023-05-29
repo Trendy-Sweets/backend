@@ -1,4 +1,4 @@
-import OrderClass from '../class/OrderClass.js';
+import OrderClass from '../class/orderClass.js';
 
 class OrderController {
    
@@ -68,6 +68,19 @@ class OrderController {
     // получаем новый статус оплаты заказа - сохраняем его в БД
     async putBuyOrderStatus(req, res) {
         try {
+            const {idOrder,StatusBuy} = req.params;
+          
+            res.json('Обновили статус оплаты заказа № ' + idOrder);
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json(error.message);
+        }
+    }
+ 
+    //  добавление в куки-файл - ts_cart - еще одного товара
+    async addProductIdToCart_Cookies(req, res) {
+        try { 
             const {idOrder,StatusBuy} = req.params;
           
             res.json('Обновили статус оплаты заказа № ' + idOrder);
