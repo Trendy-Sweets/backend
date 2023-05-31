@@ -11,16 +11,16 @@ router.use((req, res, next) => {
   ClientController.checkAuthorization(cookies); // Проверка авторизации   + добавить Имя клиента в куки
    // тут еще будем ловить корзину товаров из куки
   // 
-  
+  // hdsjkhfjkhkjsd fhdsjkhf jkdsjfk hd
   next(); // Переход к следующему маршруту
 });
 
 
 
 const rout = [
-    { method: 'get',  path: '/',                      handler: ProductController.getMainPage }, // главная
+    { method: 'get',  path: '/',                        handler: ProductController.getMainPage }, // главная
     { method: 'get',  path: '/sweet/:idProduct',        handler: ProductController.getProductInfoById }, // страница вариациипродукта
-    //{ method: 'post', path: '/register',              handler: ClientController.postSignIn }, // регистрация клиента - получить
+    { method: 'post', path: '/register',              handler: ClientController.postSignIn }, // регистрация клиента - получить
     //{ method: 'get',  path: '/login',                 handler: ClientController.getLogin },   // загрузка данных о клиенте по его номеру
     //{ method: 'post', path: '/login/post',            handler: ClientController.postLogIn },  // авторизация клиента
     //{ method: 'get',  path: '/order',                 handler: OrderController.getCartProductInfo },  //ПОказ содержтимого корзині ...отдаем инфу из БД о продукции в корзине/ Данные что в корзине получаем по гет-запросу в виде набора Айди и количества
