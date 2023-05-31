@@ -11,7 +11,8 @@ class ProductController {
             const products = await productClass.getProductGroup_list();
             const klient_arr = {
                 "IsLogin": clientClass.IsLogin,
-                "clientId": clientClass.userIdNow
+                "clientId": clientClass.userIdNow,
+                "clientName": clientClass.userName
             };
             
             var error = false;
