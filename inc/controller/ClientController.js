@@ -23,7 +23,7 @@ class ClientController {
           if (typeof cookieValue.id === 'number') {
             clientClass.IsLogin = true;
             clientClass.userIdNow = cookieValue.id;
-            clientClass.userName = cookieValue.Name;
+            clientClass.userName = cookieValue.name;
             return true;
           }
         } catch (error) {
@@ -33,11 +33,63 @@ class ClientController {
       }
     // nсраница авторизации !!!
     async postLogIn(req, res) {
-        try {
-            const {Login,Password} = req.params;
-          
-            res.json('авторизация логина');
+        var result = {
+            'email':{},
+            'password':{},
+            'okLogin': {
+                isOk: false,
+                id: 0,
+                name: '',
+                msg: ''
+            },
+            'okForm': false
+        };
 
+        try {
+            const {email,password} = req.body;
+            result['email'] = await validFormClass.checkEmail(email);
+            let countEmail  = await clientClass.checkEmailInDB(email);
+
+            if (!countEmail)
+            {
+                result['email'].isOk = false;
+                result['email'].msg  = "Проблема при пошуку пошти в базі даних";
+            }
+            else
+            {
+                if (countEmail != 1)
+                {
+                    result['email'].isOk = false;
+                    result['email'].msg  = "Email не знайдено в базі даних";
+                }
+            }
+
+            result['password'] = await validFormClass.checkPassword(password);
+
+            if (result['email'].isOk & result['password'].isOk)
+                result['okForm'] = true; 
+            
+            if (result['okForm'])
+            {
+                const paramAdd = {'email': email, 'password': password};
+                result['okLogin'] = await clientClass.loginClient(paramAdd);
+
+                // если успешно - ставим куку что мы авторизованы
+                const cookieData = { id: result['okLogin'].id, name: result['okLogin'].name };
+                const oneMonth = 30 * 24 * 60 * 60 * 1000; 
+                const cookieOptions = {
+                  maxAge: oneMonth,
+                  httpOnly: true
+                };
+                // Устанавливаем куки-файл в заголовке ответа
+                res.cookie('ts_login', JSON.stringify(cookieData), cookieOptions);
+            }
+            else {
+               // result['okLogin'].isOk = false;
+               // result['okLogin'].msg = 'Помилка даних в форміі';
+            }
+            
+            res.json(result);
 
         } catch (error) {
             console.log(error);
@@ -45,17 +97,7 @@ class ClientController {
         }
     }
 
-    async getLogin(req, res) {
-        try {
-            const {idClient} = req.params;
-            res.json('Get Info for Client with ID - '+idClient);
-
-
-        } catch (error) {
-            console.log(error);
-            res.status(500).json(error.message);
-        }
-    }
+    
     // update CLient INFO
     async putLogin(req, res) {
         try {
@@ -72,6 +114,7 @@ class ClientController {
     async postSignIn(req, res) {
         try {
             const { email, password, repassword, name } = req.body;
+            let countEmail;
             var result = {
                 'name':{},
                 'email':{},
@@ -87,10 +130,19 @@ class ClientController {
 
             // проерка поля почта - пустое или нет/ валадация адреса / проверка наличия в базе такой почты
             result['email'] = await validFormClass.checkEmail(email);
-            if (!await clientClass.checkEmailInDB(email))
+            countEmail = await clientClass.checkEmailInDB(email);
+            if (!countEmail)
             {
                 result['email'].isOk = false;
-                result['email'].msg  = "Ця почта вже зареєстрована";
+                result['email'].msg  = "Невідома помилка з базою даних";
+            }
+            else
+            {
+                if (countEmail != 0)
+                {
+                    result['email'].isOk = false;
+                    result['email'].msg  = "Цей Email вже є в базі даних";
+                }
             }
 
             // проверка на одинаковость пароля и повтор пароля / проверяем не пустые ли поля
@@ -103,7 +155,7 @@ class ClientController {
             // добавляем клиента в базу данных
             if (result['okForm']){
                 const paramAdd = {'name': name, 'email': email, 'password': password};
-                console.log(paramAdd.name);
+                //console.log(paramAdd.name);
                 result['okAddToDB'] = clientClass.addClientToDB(paramAdd);
 
                 // если успешно - ставим куку что мы авторизованы

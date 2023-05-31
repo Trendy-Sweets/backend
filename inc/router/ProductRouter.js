@@ -24,9 +24,9 @@ const rout = [
     { method: 'get',  path: '/sweet/:idProduct',        handler: ProductController.getProductInfoById }, 
     // страница регистрации - отпарвка формы
     { method: 'post', path: '/register',                handler: ClientController.postSignIn },
-   
-    //{ method: 'get',  path: '/login',                 handler: ClientController.getLogin },   // загрузка данных о клиенте по его номеру
-    //{ method: 'post', path: '/login/post',            handler: ClientController.postLogIn },  // авторизация клиента
+    // страница авторизации - отправка к нам формы с логином и паролем
+    { method: 'post',  path: '/login',                 handler: ClientController.postLogIn },
+    
     //{ method: 'get',  path: '/order',                 handler: OrderController.getCartProductInfo },  //ПОказ содержтимого корзині ...отдаем инфу из БД о продукции в корзине/ Данные что в корзине получаем по гет-запросу в виде набора Айди и количества
     //{ method: 'get',  path: '/order/status/:idOrder', handler: OrderController.getOrderStatus },  //инвормация о статусе заказа и продуктов в нем
     //{ method: 'post',  path: '/order/buy/:idOrder',   handler: OrderController.putBuyOrderStatus },  // сохранение данных о результатах оплаты заказа
