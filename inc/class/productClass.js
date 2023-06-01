@@ -259,6 +259,70 @@ class productClass {
         return result;
       }
     }
+
+    // список продуктов с инфой по списку айдишников
+    async getProductListByListId(id_list){
+      // получили массив айдишников
+      // собираем их вс троку и формируем запрос на БД
+      try {
+        
+        const query = {
+          text: 'SELECT  PR.product_name AS name, ' +
+                '        PR.productid AS productid, ' +
+                '        PR.product_foto_small AS foto, ' +
+                '        PR.product_price AS price, ' +
+                '        PG.productgroup_maxtime AS maxtime '+ 
+                'FROM product as PR '+ 
+                'RIGHT JOIN productgroup_list as PG ON PR.productgroupid = PG.productgroup_id '+
+                ' WHERE PR.productid = ANY($1::integer[]);',
+          values: [id_list.map(Number)],
+          rowMode: 'object'
+        };
+        
+        const temp  = await connDB.query(query);
+        if (temp.rowCount > 0 )
+        {
+            let result_list = [];
+            for (const row of temp.rows) {
+
+              result_list.push({
+                productid:            row.productid,
+                name:                 row.name,
+                foto:                 row.foto,
+                price:                row.price,
+                maxtime:              row.maxtime,
+              }); 
+            }
+            
+            const result = {
+              msg:'',
+              toReturn: result_list,
+              error: false,
+            };
+            
+            return result;
+            
+          }
+          else
+          {
+            const result = {
+              msg:"Дані про продукти відсутні повністю або присутні в неповному обсязі ",
+              toReturn: "",
+              error: true,
+            };
+            return result;
+          }
+      }
+      catch(err) {
+        //console.log(err);
+        const result = {
+          msg:err,
+          toReturn: "",
+          error: true,
+        };
+        return result;
+      }
+    }
   }
   
   export default  new productClass();

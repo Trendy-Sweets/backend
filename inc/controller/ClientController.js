@@ -12,7 +12,7 @@ class ClientController {
             return false;
           }
           // ts_login={"id": 2}; Path=/;
-          const cookieValue = JSON.parse(cookies.ts_login);
+          const cookieValue = await JSON.parse(cookies.ts_login);
           
           if (cookieValue.id === false) {
             clientClass.IsLogin = false;

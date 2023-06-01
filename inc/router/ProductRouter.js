@@ -8,10 +8,8 @@ const router = new Router;
 // Проверка авторизации один раз в главном роутере
 router.use((req, res, next) => {
   const cookies = req.cookies;
-  ClientController.checkAuthorization(cookies); // Проверка авторизации   + добавить Имя клиента в куки
-   // тут еще будем ловить корзину товаров из куки
-  // 
-  // hdsjkhfjkhkjsd fhdsjkhf jkdsjfk hd
+  ClientController.checkAuthorization(cookies); // Проверка авторизации 
+  
   next(); // Переход к следующему маршруту
 });
 
@@ -25,8 +23,13 @@ const rout = [
     // страница регистрации - отпарвка формы
     { method: 'post', path: '/register',                handler: ClientController.postSignIn },
     // страница авторизации - отправка к нам формы с логином и паролем
-    { method: 'post',  path: '/login',                 handler: ClientController.postLogIn },
+    { method: 'post',  path: '/login',                  handler: ClientController.postLogIn },
+    // страница - корзина  ---- получаем куку с перечнем продуктов и выдаем по ним инфу
+    { method: 'get', path: '/cart',                     handler: ProductController.getProductInCart},
     
+    //  оформление заказа - передают POST массив с данными о заказе и куку с перечнем продуктов в корзине
+    //{ method: 'post', path: '/'}
+
     //{ method: 'get',  path: '/order',                 handler: OrderController.getCartProductInfo },  //ПОказ содержтимого корзині ...отдаем инфу из БД о продукции в корзине/ Данные что в корзине получаем по гет-запросу в виде набора Айди и количества
     //{ method: 'get',  path: '/order/status/:idOrder', handler: OrderController.getOrderStatus },  //инвормация о статусе заказа и продуктов в нем
     //{ method: 'post',  path: '/order/buy/:idOrder',   handler: OrderController.putBuyOrderStatus },  // сохранение данных о результатах оплаты заказа

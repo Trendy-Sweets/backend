@@ -122,6 +122,90 @@ class ProductController {
         }
     }
 
+      // загрузка данных о товарах в корзине
+      async getProductInCart(req, res) {
+        try {
+            
+            let result = {
+                products:'',
+                allCartPrice:0,
+                error:false,
+                msgError: '',
+            };
+
+            if (req.cookies.cart)
+            {
+                // Разбираем данные из куки-файла
+                
+                const cartItems = await JSON.parse(req.cookies.cart);
+                // получаем инфу о продуктах
+                const id_list = Object.keys(cartItems);
+                if (id_list.length === 0) {
+                    //console.error('Корзина пуста. Добавьте товары в корзину.');
+                    result.error = true;
+                    result.msgError = 'Кошик порожній. Додайте необхідні солодощі спочатку.';
+                }
+                else {
+                    let flag_id = true;
+                    for (let i = 0; i < id_list.length; i++) {
+                        const idProduct = id_list[i];
+                        if (isNaN(Number(idProduct))) {
+                            //console.error(`Неверный ключ: ${idProduct}. Ключ должен быть числом.`);
+                            flag_id = false;
+                        }
+                    } 
+                    // проверяем что мы там получили с ключами
+                    if (flag_id)
+                    {
+                        // значит все ключи - цифры // уже ок - можно передавать на обработку
+                       
+                        let product_info_rows = await productClass.getProductListByListId(id_list);
+                        //console.log(product_info_rows);
+
+                        if (!product_info_rows.error)
+                        {
+                            let allCartPrice = 0;
+                            const modifiedToReturn = product_info_rows.toReturn.map(item => {
+                                const count = cartItems[item.productid];
+                                allCartPrice += item.price * count;
+                                return { ...item, count };
+                            });
+                            
+                            result = {
+                                products: modifiedToReturn,
+                                allCartPrice: allCartPrice,
+                            }
+
+                        }
+                        else
+                        {
+                            result.error = true;
+                            result.msgError = product_info_rows.msg;
+                        }
+                    }
+                    else
+                    {
+                        result.error = true;
+                        result.msgError = 'Помилка в кукі файлі. Невірні дані для обробки';
+                    }
+                }
+                
+                res.json(result);
+            }
+            else
+            {
+                result.error = true;
+                result.msgError = 'Відсутній файл cookie cart';
+                res.json(result);
+            }
+            
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json(error.message);
+        }
+    }
+
 
 }
 
