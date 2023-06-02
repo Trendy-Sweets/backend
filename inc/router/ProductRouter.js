@@ -28,7 +28,8 @@ const rout = [
     { method: 'get', path: '/cart',                     handler: ProductController.getProductInCart},
     // страница оформления заказа  --- дакем данные по текущей корзине и статусу атворизации клиента
     { method: 'get', path: '/cart/addOrderForm',        handler: OrderController.getAddFormInfo},
-
+    // рпием данных с формы оформления заказа
+    { method: 'post', path: '/order/add',               handler: OrderController.addNewOrder},
 
     //  оформление заказа - передают POST массив с данными о заказе и куку с перечнем продуктов в корзине
     //{ method: 'post', path: '/'}

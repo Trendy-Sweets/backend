@@ -4,8 +4,8 @@ class validFormClass {
   
     constructor() {
         this.result = {
-            "isOk": false,
-            "msg": ""
+            isOk: false,
+            msg: ""
         };
 
         this.passwordMinLenght = 6;
@@ -146,6 +146,48 @@ class validFormClass {
             this.result.msg = "Вказані різні паролі";
         }
         return this.result;
+      }
+
+      // проверяет куку с корзиной товаров на базовіе ошибки 
+      async validCookieCart(cart)
+      {
+        this.result = {};
+        if (cart)
+            {
+                const cartItems = await JSON.parse(cart);
+                // получаем инфу о продуктах
+                const id_list = Object.keys(cartItems);
+                if (id_list.length === 0) {
+                    this.result.isOk = false;
+                    this.result.msg = 'Кошик порожній. Додайте необхідні солодощі спочатку.';
+                }
+                else {
+                    let flag_id = true;
+                    for (let i = 0; i < id_list.length; i++) {
+                        const idProduct = id_list[i];
+                        if (isNaN(Number(idProduct))) {
+                            flag_id = false;
+                        }
+                    } 
+                    // проверяем что мы там получили с ключами
+                    if (flag_id)
+                    {
+                        this.result.isOk = true;
+                        this.result.msg = "";
+                    }
+                    else
+                    {
+                        this.result.isOk = false;
+                        this.result.msg = 'Помилка в кукі файлі. Невірні дані для обробки';
+                    }
+                }
+            }
+            else
+            {
+                this.result.isOk = false;
+                this.result.msg = 'Відсутній файл cookie cart';
+            }
+        return this.result
       }
   }
   

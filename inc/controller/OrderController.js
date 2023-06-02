@@ -1,10 +1,15 @@
 import clientClass from '../class/clientClass.js';
 import OrderClass from '../class/orderClass.js';
 import productClass from '../class/productClass.js';
+import validFormClass from '../class/validFormClass.js';
+
+
+import config from '../../config.json' assert { type: "json" };
+import region from '../lib/region.json' assert { type: "json"};
+import city   from '../lib/city.json' assert {type: "json"};
 
 class OrderController {
    
-
     // формируем данные для формы оформления заказа
     async getAddFormInfo(req, res) {
 
@@ -18,73 +23,58 @@ class OrderController {
                 clientId: null,
                 clientName: null
             },
+            region: {
+                region_code: [config.default_params.region],
+                region_name: [region.DP],
+            },
+            city: {
+                city_code: [config.default_params.city],
+                city_name: [city.DP],
+            },
+            
         };
 
         try {
-            // парсим куку с содержимым корзины
-            // получем данные о товарах
-            if (req.cookies.cart)
-            {
+            
+            const temp = await validFormClass.validCookieCart(req.cookies.cart);
+            if (temp.isOk)
+            { // с кукой все ок
+                // значит все ключи - цифры // уже ок - можно передавать на обработку
                 const cartItems = await JSON.parse(req.cookies.cart);
                 // получаем инфу о продуктах
                 const id_list = Object.keys(cartItems);
-                if (id_list.length === 0) {
-                    result.error = true;
-                    result.msgError = 'Кошик порожній. Додайте необхідні солодощі спочатку.';
+                let product_info_rows = await productClass.getProductListByListId(id_list);
+
+                if (!product_info_rows.error)
+                {
+                    let allCartPrice = 0;
+                    const modifiedToReturn = product_info_rows.toReturn.map(item => {
+                        const count = cartItems[item.productid];
+                        allCartPrice += item.price * count;
+                        return { ...item, count };
+                    });
+                    
+                    result.products     = modifiedToReturn;
+                    result.allCartPrice = allCartPrice;
+                    result.error = false;
+                    result.client = {
+                        IsLogin: clientClass.IsLogin,
+                        clientId: clientClass.userIdNow,
+                        clientName: clientClass.userName
+                    };
+
                 }
-                else {
-                    let flag_id = true;
-                    for (let i = 0; i < id_list.length; i++) {
-                        const idProduct = id_list[i];
-                        if (isNaN(Number(idProduct))) {
-                            flag_id = false;
-                        }
-                    } 
-                    // проверяем что мы там получили с ключами
-                    if (flag_id)
-                    {
-                        // значит все ключи - цифры // уже ок - можно передавать на обработку
-                         
-                        let product_info_rows = await productClass.getProductListByListId(id_list);
-
-                        if (!product_info_rows.error)
-                        {
-                            let allCartPrice = 0;
-                            const modifiedToReturn = product_info_rows.toReturn.map(item => {
-                                const count = cartItems[item.productid];
-                                allCartPrice += item.price * count;
-                                return { ...item, count };
-                            });
-                            
-                            result.products     = modifiedToReturn;
-                            result.allCartPrice = allCartPrice;
-
-                            result.client = {
-                                IsLogin: clientClass.IsLogin,
-                                clientId: clientClass.userIdNow,
-                                clientName: clientClass.userName
-                            };
-
-                        }
-                        else
-                        {
-                            result.error = true;
-                            result.msgError = product_info_rows.msg;
-                        }
-                    }
-                    else
-                    {
-                        result.error = true;
-                        result.msgError = 'Помилка в кукі файлі. Невірні дані для обробки';
-                    }
+                else
+                {
+                    result.error = true;
+                    result.msgError = product_info_rows.msg;
                 }
             }
             else
             {
                 result.error = true;
-                result.msgError = 'Відсутній файл cookie cart';
+                result.msgError = temp.msg;
             }
-
             res.json(result);
 
         } catch (error) {
@@ -92,7 +82,43 @@ class OrderController {
             res.status(500).json(error.message);
         }
     }
-  
+  // страница - оформление заказа / ПРИЕМ данных с формы
+    async addNewOrder(req, res) {
+
+        let result = {
+            isCreateOrder: false, // флаг создания записи в БД о заказе
+            msgError: '',
+            pay_url:'', 
+            pay_param: {},
+        }
+
+        try {
+            // парсим куки cart
+            // проверяем на доступность указанных idProduct ?????
+            const temp = await validFormClass.validCookieCart(req.cookies.cart);
+            if (temp.isOk)
+            { // с кукой все ок
+                // значит все ключи - цифры // уже ок - можно передавать на обработку
+                const cartItems = await JSON.parse(req.cookies.cart);
+                console.log(cartItems);
+
+                // создаем запись в таблицах order_list / order_product
+                // ставим пометку что оплаты нет
+                
+            }
+            else
+            {
+                result.isCreateOrder = false;
+                result.msgError      = temp.msg;
+            }
+            
+            res.json(result);
+        }
+        catch(err) {
+            console.log(err);
+            res.status(500).json(err.message);
+        }
+    }
     // клиент оформляет заказ - заполняет данные по доставке, дате и прочее
     // принимаем вместе с перечнем продуктов в корзине и их количеством
     async postCartProcessingToOrder(req, res) {

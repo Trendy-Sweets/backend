@@ -1,6 +1,7 @@
 import productClass from '../class/productClass.js';
 import sloganClass from '../class/sloganClass.js';
 import clientClass from '../class/clientClass.js';
+import validFormClass from '../class/validFormClass.js';
 
 class ProductController {
     async getMainPage(req, res) {
@@ -10,13 +11,17 @@ class ProductController {
             const result = await sloganClass.getSlogan();
             const products = await productClass.getProductGroup_list();
             const klient_arr = {
-                "IsLogin": clientClass.IsLogin,
-                "clientId": clientClass.userIdNow,
-                "clientName": clientClass.userName
+                IsLogin: clientClass.IsLogin,
+                clientId: clientClass.userIdNow,
+                clientName: clientClass.userName
+            };
+            const cart       = {
+                allCartPrice: 0,
+                allProductCount: 0
             };
             
-            var error = false;
-            var errorMSG = "";
+            let error = false;
+            let errorMSG = "";
             if (!result) 
             {
                 error = true;
@@ -30,11 +35,48 @@ class ProductController {
             // if products.msg == "ok" - то все хорошо
             // если  .msg ==  error  - то были проблемы с получением данных
             // текст ошибки лежит в products.error
+            // *** смотрим корзину
+            const temp = await validFormClass.validCookieCart(req.cookies.cart);
+            if (temp.isOk)
+            { // с кукой все ок
+              // значит все ключи - цифры // уже ок - можно передавать на обработку
+                const cartItems = await JSON.parse(req.cookies.cart);
+                // получаем инфу о продуктах
+                const id_list = Object.keys(cartItems);
+                let product_info_rows = await productClass.getProductListByListId(id_list);
 
+                if (!product_info_rows.error)
+                {
+                    let allCartPrice = 0;
+                    let countProduct = 0;
+                    const modifiedToReturn = product_info_rows.toReturn.map(item => {
+                                
+                                countProduct += cartItems[item.productid];
+                                allCartPrice += item.price * cartItems[item.productid];
+                                return { ...item};
+                    });
+                            
+                    cart.allCartPrice    = allCartPrice;
+                    cart.allProductCount = countProduct;
+
+                }
+                else
+                {
+                    cart.allCartPrice    = 0;
+                    cart.allProductCount = 0;
+                }
+            }
+            else
+            {
+                cart.allCartPrice    = 0;
+                cart.allProductCount = 0;
+            }
+            // ******************
             const tosend = {
                 slogan: result,
-                products: products.toReturn, //array
-                klient: klient_arr, // status_log:false/true login: name: idclient
+                products: products.toReturn,    //array
+                сlient: klient_arr,             // status_log:false/true login: name: idclient
+                cart: cart,                     // состояние корзины
                 error: false,
             };
             res.json(tosend);
@@ -99,16 +141,16 @@ class ProductController {
             
             const temp_group = await productClass.getProductGroupInfo(idGroup);
             const temp_list  = await productClass.getProductsListInGroup(idGroup);
-            const klient_arr = [];
-
+            const klient_arr = {};
+            
             // if temp_group/temp_list.msg == "ok" - то все хорошо
             // если  .msg ==  error  - то были проблемы с получением данных
             // текст ошибки лежит в temp_group/temp_list.error
-
             const tosend = {
                 groupInfo: temp_group.toReturn, //  информация о группе продуктов
-                products: temp_list.toReturn, // список вариаций продукта
-                klient: klient_arr, // status_log:false/true login: name: idclient
+                products: temp_list.toReturn,   // список вариаций продукта
+                сlient: klient_arr,             // status_log:false/true login: name: idclient
+                
                 error: false,
             };
 
@@ -123,44 +165,24 @@ class ProductController {
     }
 
       // загрузка данных о товарах в корзине
-      async getProductInCart(req, res) {
+    async getProductInCart(req, res) {
         try {
             
-            let result = {
-                products:'',
-                allCartPrice:0,
-                error:false,
-                msgError: '',
-            };
-
-            if (req.cookies.cart)
-            {
-                // Разбираем данные из куки-файла
-                
-                const cartItems = await JSON.parse(req.cookies.cart);
-                // получаем инфу о продуктах
-                const id_list = Object.keys(cartItems);
-                if (id_list.length === 0) {
-                    //console.error('Корзина пуста. Добавьте товары в корзину.');
-                    result.error = true;
-                    result.msgError = 'Кошик порожній. Додайте необхідні солодощі спочатку.';
-                }
-                else {
-                    let flag_id = true;
-                    for (let i = 0; i < id_list.length; i++) {
-                        const idProduct = id_list[i];
-                        if (isNaN(Number(idProduct))) {
-                            //console.error(`Неверный ключ: ${idProduct}. Ключ должен быть числом.`);
-                            flag_id = false;
-                        }
-                    } 
-                    // проверяем что мы там получили с ключами
-                    if (flag_id)
-                    {
+                let result = {
+                    products:'',
+                    allCartPrice:0,
+                    error:false,
+                    msgError: '',
+                };
+                    // Разбираем данные из куки-файла
+                    const temp = await validFormClass.validCookieCart(req.cookies.cart);
+                    if (temp.isOk)
+                    { // с кукой все ок
                         // значит все ключи - цифры // уже ок - можно передавать на обработку
-                       
+                        const cartItems = await JSON.parse(req.cookies.cart);
+                        // получаем инфу о продуктах
+                        const id_list = Object.keys(cartItems);
                         let product_info_rows = await productClass.getProductListByListId(id_list);
-                        //console.log(product_info_rows);
 
                         if (!product_info_rows.error)
                         {
@@ -187,24 +209,16 @@ class ProductController {
                     else
                     {
                         result.error = true;
-                        result.msgError = 'Помилка в кукі файлі. Невірні дані для обробки';
+                        result.msgError = temp.msg;
                     }
-                }
+                    
+                    res.json(result);
                 
-                res.json(result);
-            }
-            else
-            {
-                result.error = true;
-                result.msgError = 'Відсутній файл cookie cart';
-                res.json(result);
-            }
-            
 
-        } catch (error) {
-            console.log(error);
-            res.status(500).json(error.message);
-        }
+            } catch (error) {
+                console.log(error);
+                res.status(500).json(error.message);
+            }
     }
 
 
