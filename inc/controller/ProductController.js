@@ -174,6 +174,7 @@ class ProductController {
                             result = {
                                 products: modifiedToReturn,
                                 allCartPrice: allCartPrice,
+                                error: false,
                             }
 
                         }
