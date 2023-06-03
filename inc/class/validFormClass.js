@@ -1,4 +1,6 @@
 import { time } from "console";
+import region_list from '../lib/region.json' assert { type: "json" };
+import city_list from '../lib/city.json' assert { type: "json" };
 
 class validFormClass {
   
@@ -189,6 +191,214 @@ class validFormClass {
             }
         return this.result
       }
+    
+      async checkPhone(phone) {
+        this.result = {};
+      try {
+        // проверяем пустое поле или нет
+        if (phone === undefined || phone === null) {
+            this.result.isOk = false;
+            this.result.msg  = "Поле Телефон - порожнє!";
+        }
+        else if (phone.trim().lenght === 0)
+        {
+            this.result.isOk = false;
+            this.result.msg  = "Поле Телефон - порожнє!";
+            
+        }
+        else
+        {
+            //  проверка на запрещенные символы - разрешены только цифры
+            // корректный номер - +38(123)456 78 90
+            const regex = /^\+38\(\d{3}\)\d{3}\s\d{2}\s\d{2}$/;
+            const isValid = regex.test(phone);
+            
+            if (isValid) {
+                // Поле `name` содержит только буквы латинского алфавита или кириллицы
+               this.result.isOk = true;
+               this.result.msg = "Поле Телефон - корректне";
+               
+            } else {
+                this.result.isOk = false;
+                this.result.msg = "Поле Телефон містить некорректні символи. Дозволено - +38(123)456 78 90.";
+              
+            }
+        }
+
+        return this.result;
+        
+      } catch (error) {
+        console.error(error);
+        this.result.isOk = false;
+        this.result.msg = "Виникла невідома помилка при валідації поля Телефон";
+        return this.result;
+      }
+    }
+
+    async checkRegion(region) { 
+        // проверка переданного региона 
+        // передаем код региона - должен соответствовать нашему набору регионов
+        this.result = {};
+      try {
+        // проверяем пустое поле или нет
+        if (region === undefined || region === null) {
+            this.result.isOk = false;
+            this.result.msg  = "Поле Область - порожнє!";
+        }
+        else if (region.trim().lenght === 0)
+        {
+            this.result.isOk = false;
+            this.result.msg  = "Поле Область - порожнє!";
+            
+        }
+        else
+        {
+            // тут провеям, что выбранный код у нас есть в списке
+            if (region in region_list)
+            {
+                this.result.isOk = true;
+                this.result.msg = 'Поле Область - корректне';
+            }
+            else
+            {
+                this.result.isOk = false;
+                this.result.msg  = 'Поле Область містить не корректний запис';
+            }
+        }
+
+        return this.result;
+        
+      } catch (error) {
+        console.error(error);
+        this.result.isOk = false;
+        this.result.msg = "Виникла невідома помилка при валідації поля Область";
+        return this.result;
+      }
+    }
+
+    async checkCity(city) { 
+        this.result = {};
+      try {
+        // проверяем пустое поле или нет
+        if (city === undefined || city === null) {
+            this.result.isOk = false;
+            this.result.msg  = "Поле Місто - порожнє!";
+        }
+        else if (city.trim().lenght === 0)
+        {
+            this.result.isOk = false;
+            this.result.msg  = "Поле Місто - порожнє!";
+            
+        }
+        else
+        {
+            // тут провеям, что выбранный код у нас есть в списке
+            if (city in city_list)
+            {
+                this.result.isOk = true;
+                this.result.msg = 'Поле Місто - корректне';
+            }
+            else
+            {
+                this.result.isOk = false;
+                this.result.msg  = 'Поле Місто містить не корректний запис';
+            }
+        }
+
+        return this.result;
+        
+      } catch (error) {
+        console.error(error);
+        this.result.isOk = false;
+        this.result.msg = "Виникла невідома помилка при валідації поля Місто";
+        return this.result;
+      }
+    }
+
+    async checkAdress(adress) {
+        this.result = {};
+      try {
+        // проверяем пустое поле или нет
+        if (adress === undefined || adress === null) {
+            this.result.isOk = false;
+            this.result.msg  = "Поле Адреса - порожнє!";
+        }
+        else if (adress.trim().lenght === 0)
+        {
+            this.result.isOk = false;
+            this.result.msg  = "Поле Адреса - порожнє!";
+            
+        }
+        else
+        {
+            //  проверка на запрещенные символы - разрешены только буквы лат и киррилица
+            const regex = /^[\p{L}\d\s.,-]+$/u;
+            const isValid = regex.test(adress);
+            
+            if (isValid) {
+                // Поле `name` содержит только буквы латинского алфавита или кириллицы
+               this.result.isOk = true;
+               this.result.msg = "Поле Адреса - корректне";
+               
+            } else {
+                this.result.isOk = false;
+                this.result.msg = "Поле Адреса містить некорректні символи. Дозволено - лише літери.";
+              
+            }
+        }
+
+        return this.result;
+        
+      } catch (error) {
+        console.error(error);
+        this.result.isOk = false;
+        this.result.msg = "Виникла невідома помилка при валідації поля Імʼя";
+        return this.result;
+      }
+    }
+    
+    async checkDate(date) {
+        this.result = {};
+      try {
+        // проверяем пустое поле или нет
+        if (date === undefined || date === null) {
+            this.result.isOk = false;
+            this.result.msg  = "Поле Дата - порожнє!";
+        }
+        else if (date.trim().lenght === 0)
+        {
+            this.result.isOk = false;
+            this.result.msg  = "Поле Дата - порожнє!";
+            
+        }
+        else
+        {
+            // формат  04.05.2023
+            // /^\+38\(\d{3}\)\d{3}\s\d{2}\s\d{2}$/;
+            const regex = /^\+38\(\d{3}\)\d{3}\s\d{2}\s\d{2}$/;
+            const isValid = regex.test(date);
+            
+            if (isValid) {
+                // Поле `name` содержит только буквы латинского алфавита или кириллицы
+               this.result.isOk = true;
+               this.result.msg = "Поле Дата - корректне";
+               
+            } else {
+                this.result.isOk = false;
+                this.result.msg = "Поле Адреса містить некорректні символи. Дозволено - лише літери.";
+              
+            }
+        }
+
+        return this.result;
+        
+      } catch (error) {
+        console.error(error);
+        this.result.isOk = false;
+        this.result.msg = "Виникла невідома помилка при валідації поля Імʼя";
+        return this.result;
+      }
+    }
   }
   
   export default new validFormClass();

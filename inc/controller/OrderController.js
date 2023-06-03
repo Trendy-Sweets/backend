@@ -5,8 +5,8 @@ import validFormClass from '../class/validFormClass.js';
 
 
 import config from '../../config.json' assert { type: "json" };
-import region from '../lib/region.json' assert { type: "json"};
-import city   from '../lib/city.json' assert {type: "json"};
+import region_list from '../lib/region.json' assert { type: "json"};
+import city_list  from '../lib/city.json' assert {type: "json"};
 
 class OrderController {
    
@@ -25,11 +25,11 @@ class OrderController {
             },
             region: {
                 region_code: [config.default_params.region],
-                region_name: [region.DP],
+                region_name: [region_list.DP],
             },
             city: {
                 city_code: [config.default_params.city],
-                city_name: [city.DP],
+                city_name: [city_list.DP],
             },
             
         };
@@ -102,9 +102,16 @@ class OrderController {
                 const cartItems = await JSON.parse(req.cookies.cart);
                 console.log(cartItems);
 
+                // собираем/проверяем POST параметры
+                const clientId = clientClass.userIdNow;
+                const clientName = clientClass.userName;
+                const {phone, region, city, adress, date, time} = req.body;
+                
+
+                console.log('User id  = '+clientId+' | User Name = '+ clientName);
                 // создаем запись в таблицах order_list / order_product
                 // ставим пометку что оплаты нет
-                
+
             }
             else
             {

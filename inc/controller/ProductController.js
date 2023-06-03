@@ -2,6 +2,7 @@ import productClass from '../class/productClass.js';
 import sloganClass from '../class/sloganClass.js';
 import clientClass from '../class/clientClass.js';
 import validFormClass from '../class/validFormClass.js';
+import config from '../../config.json' assert { type: "json" };
 
 class ProductController {
     async getMainPage(req, res) {
@@ -169,8 +170,10 @@ class ProductController {
         try {
             
                 let result = {
+                    countProduct:0,
                     products:'',
                     allCartPrice:0,
+                    beforTAXFree:0,
                     error:false,
                     msgError: '',
                 };
@@ -184,18 +187,23 @@ class ProductController {
                         const id_list = Object.keys(cartItems);
                         let product_info_rows = await productClass.getProductListByListId(id_list);
 
+                        let allCartPrice = 0;
+                        let countProduct = 0;
                         if (!product_info_rows.error)
                         {
-                            let allCartPrice = 0;
+                            
                             const modifiedToReturn = product_info_rows.toReturn.map(item => {
                                 const count = cartItems[item.productid];
                                 allCartPrice += item.price * count;
+                                countProduct += count;
                                 return { ...item, count };
                             });
                             
                             result = {
+                                countProduct:countProduct,
                                 products: modifiedToReturn,
                                 allCartPrice: allCartPrice,
+                                beforTAXFree:  (config.freeTAX - allCartPrice)<0? 0:(config.freeTAX - allCartPrice),
                                 error: false,
                             }
 
