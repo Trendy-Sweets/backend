@@ -195,6 +195,8 @@ class ProductController {
                             const modifiedToReturn = product_info_rows.toReturn.map(item => {
                                 const count = cartItems[item.productid];
                                 allCartPrice += item.price * count;
+                                item.priceOne = item.price;
+                                item.price = item.price*count;
                                 countProduct += count;
                                 return { ...item, count };
                             });
