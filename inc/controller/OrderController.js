@@ -7,6 +7,7 @@ import validFormClass from '../class/validFormClass.js';
 import config from '../../config.json' assert { type: "json" };
 import region_list from '../lib/region.json' assert { type: "json"};
 import city_list  from '../lib/city.json' assert {type: "json"};
+import orderClass from '../class/orderClass.js';
 
 class OrderController {
    
@@ -29,7 +30,7 @@ class OrderController {
             },
             city: {
                 city_code: [config.default_params.city],
-                city_name: [city_list.DP],
+                city_name: [city_list.DP.DP],
             },
             
         };
@@ -88,6 +89,32 @@ class OrderController {
         let result = {
             isCreateOrder: false, // флаг создания записи в БД о заказе
             msgError: '',
+            validForm:{
+                phone:{
+                    isOk:false,
+                    msg:''
+                },
+                region:{
+                    isOk:false,
+                    msg:''
+                },
+                city:{
+                    isOk:false,
+                    msg:''
+                },
+                adres:{
+                    isOk:false,
+                    msg:''
+                },
+                date:{
+                    isOk:false,
+                    msg:''
+                },
+                time:{
+                    isOk:false,
+                    msg:''
+                },
+            },
             pay_url:'', 
             pay_param: {},
         }
@@ -98,20 +125,71 @@ class OrderController {
             const temp = await validFormClass.validCookieCart(req.cookies.cart);
             if (temp.isOk)
             { // с кукой все ок
-                // значит все ключи - цифры // уже ок - можно передавать на обработку
-                const cartItems = await JSON.parse(req.cookies.cart);
-                console.log(cartItems);
-
-                // собираем/проверяем POST параметры
-                const clientId = clientClass.userIdNow;
-                const clientName = clientClass.userName;
-                const {phone, region, city, adress, date, time} = req.body;
                 
+                // проверяем авторизацию
+                if (clientClass.IsLogin)
+                {
+                    const clientId = clientClass.userIdNow;
+                    const clientName = clientClass.userName;
+                    // значит все ключи - цифры // уже ок - можно передавать на обработку и авторизация ок
+                    const cartItems = await JSON.parse(req.cookies.cart);
+                    //console.log(cartItems);
+    
+                    // максимальное время для приготовления изделия
+                    const maxTime = await  productClass.getMaxTimeExecuteProduct(Object.keys(cartItems));
+                    const allPrice = await productClass.getAllPrice(cartItems);
+                    //console.log('allPrice = '+allPrice);
+                    if (maxTime.error)
+                    {
+                        result.isCreateOrder = false;
+                        result.msgError = 'Не змогли отримати максимальний час ни виготовлення замовлення';
+                    }
+                    else
+                    {
+                            // собираем/проверяем POST параметры
+                            const {phone, region, city, adress, date, time} = req.body;
 
-                console.log('User id  = '+clientId+' | User Name = '+ clientName);
-                // создаем запись в таблицах order_list / order_product
-                // ставим пометку что оплаты нет
-
+                            result.validForm.adres  = await validFormClass.checkAdress(adress);
+                            result.validForm.phone  = await validFormClass.checkPhone(phone);
+                            result.validForm.date   = await validFormClass.checkDate(date, maxTime.maxTime);
+                            result.validForm.time   = await validFormClass.checkTime(time); 
+                            result.validForm.region = await validFormClass.checkRegion(region);
+                            result.validForm.city   = await validFormClass.checkCity(city, region);
+                            
+                            if (Object.values(result.validForm).every(field => field.isOk))
+                            {
+                                // све поля правильные
+                                //console.log('User id  = '+clientId+' | User Name = '+ clientName);
+                                // создаем запись в таблицах order_list / order_product
+                                // ставим пометку что оплаты нет
+                                const dataForm = {
+                                    phone: phone,
+                                    region: region,
+                                    city: city,
+                                    adress: adress,
+                                    date: date,
+                                    time: time
+                                }
+                                //console.log('Form - ' + dataForm);
+                                //console.log('CartItems - '+ cartItems);
+                                const idOrder = await orderClass.addNewOrder(clientId, allPrice, dataForm, cartItems);
+                                if (!idOrder)
+                                {
+                                    result.isCreateOrder = false;
+                                    result.msgError      = "Помилка при створенны замовлення";
+                                }
+                                else
+                                {
+                                    result.isCreateOrder = true;
+                                }
+                            }
+                    }
+                }
+                else
+                {
+                    result.isCreateOrder = false;
+                    result.msgError      = "Помилка авторизації клієнта";
+                }
             }
             else
             {

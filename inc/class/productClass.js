@@ -1,9 +1,10 @@
+import { query } from 'express';
 import { connDB } from '../../index.js';
 class productClass {
     async getProductGroup_list() {
       try {
         const query = {
-          text: 'SELECT * FROM product LEFT JOIN productgroup_list  ON productgroup_list.productgroup_id = product.productgroupid  WHERE productgroup_list.status_public = 1  ORDER BY productgroup_list.productgroup_id ASC; ',
+          text: 'SELECT * FROM product LEFT JOIN productgroup_list  ON productgroup_list.productgroup_id = product.productgroupid  WHERE product.status_public = true AND productgroup_list.status_public = 1  ORDER BY productgroup_list.productgroup_id ASC; ',
           values: '',
           rowMode: 'object' //'array',
         }
@@ -323,6 +324,79 @@ class productClass {
         return result;
       }
     }
+// ******************************
+//  получаем общую стоимость корзины
+    async getAllPrice(cartitems)
+    {
+      try{
+        const id_list = Object.keys(cartitems);
+        const query = {
+          text: 'SELECT  PR.product_price AS price, PR.productid AS productid '+ 
+                'FROM product as PR '+ 
+                ' WHERE PR.productid = ANY($1::integer[]);',
+          values: [id_list.map(Number)],
+          rowMode: 'object'
+        };
+        
+        const temp  = await connDB.query(query);
+        let allPrice = 0;
+        for (const row of temp.rows) {
+          allPrice += row.price * cartitems[row.productid];
+        }
+        return allPrice;
+      }
+      catch(err){
+        console.log(err);
+        return err;
+      }
+    }
+//******************************************** */
+    // поиск максимального првемени приготовления изделаия из тех что находятся в списке вида [id1,id2,...,id999]
+    async getMaxTimeExecuteProduct(id_list){
+
+      const result = {
+        msg:"",
+        maxTime: 0, // выражается в количеств часов !!!!!
+        error: true,
+      };
+
+      try{
+          const query = {
+                text: 'SELECT  MAX(PG.productgroup_maxtime) AS maxtime ' +
+                      'FROM productgroup_list AS PG '+ 
+                      ' WHERE PG.productgroup_id IN (SELECT PR.productgroupid FROM product AS PR WHERE PR.productid = ANY($1::integer[]));',
+                values: [id_list.map(Number)],
+                rowMode: 'object'
+        };
+        
+       
+        const temp  = await connDB.query(query);
+
+        //console.log('MaxTime = ' + temp.rows[0].maxtime);
+
+        if (temp.rowCount == 1)
+        {
+          result.error = false;
+          result.maxTime = temp.rows[0].maxtime;
+        }
+        else
+        {
+          result.error = true;
+          result.msg = 'Error in SQl query to Data Base - search maxTime';
+        }
+
+        return result;
+
+      }
+      catch(err){
+        result.error = true;
+        result.maxTime = 0;
+        result.msg = err;
+        //console.log(err);
+        return result;
+      }
+    }
+
   }
   
   export default  new productClass();

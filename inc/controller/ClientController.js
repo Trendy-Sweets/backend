@@ -81,6 +81,7 @@ class ClientController {
                   maxAge: oneMonth,
                   httpOnly: true
                 };
+
                 // Устанавливаем куки-файл в заголовке ответа
                 res.cookie('ts_login', JSON.stringify(cookieData), cookieOptions);
             }

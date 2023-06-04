@@ -276,7 +276,7 @@ class validFormClass {
       }
     }
 
-    async checkCity(city) { 
+    async checkCity(city,region) { 
         this.result = {};
       try {
         // проверяем пустое поле или нет
@@ -293,7 +293,7 @@ class validFormClass {
         else
         {
             // тут провеям, что выбранный код у нас есть в списке
-            if (city in city_list)
+            if (city in city_list[region])
             {
                 this.result.isOk = true;
                 this.result.msg = 'Поле Місто - корректне';
@@ -332,7 +332,7 @@ class validFormClass {
         else
         {
             //  проверка на запрещенные символы - разрешены только буквы лат и киррилица
-            const regex = /^[\p{L}\d\s.,-]+$/u;
+            const regex = /^[\p{L}\d\s.,\-/]+$/u;
             const isValid = regex.test(adress);
             
             if (isValid) {
@@ -342,8 +342,7 @@ class validFormClass {
                
             } else {
                 this.result.isOk = false;
-                this.result.msg = "Поле Адреса містить некорректні символи. Дозволено - лише літери.";
-              
+                this.result.msg = "Поле Адреса містить некорректні символи.";
             }
         }
 
@@ -357,7 +356,7 @@ class validFormClass {
       }
     }
     
-    async checkDate(date) {
+    async checkDate(date, maxtime) {
         this.result = {};
       try {
         // проверяем пустое поле или нет
@@ -373,19 +372,31 @@ class validFormClass {
         }
         else
         {
-            // формат  04.05.2023
-            // /^\+38\(\d{3}\)\d{3}\s\d{2}\s\d{2}$/;
-            const regex = /^\+38\(\d{3}\)\d{3}\s\d{2}\s\d{2}$/;
+            // 04.05.2023
+            const regex = /^(0[1-9]|[1-2]\d|3[01])\.(0[1-9]|1[0-2])\.\d{4}$/;
             const isValid = regex.test(date);
             
             if (isValid) {
-                // Поле `name` содержит только буквы латинского алфавита или кириллицы
-               this.result.isOk = true;
-               this.result.msg = "Поле Дата - корректне";
-               
+                // проверяем чтоб указанная дата была позже текущей + maxtime
+                const currentDate = new Date();
+                const specifiedDate = new Date(date);
+                
+                const futureDate = new Date(currentDate.getTime() + maxtime * 60 * 60 * 1000);
+                const isAfterMaxTime = specifiedDate > futureDate;
+                if (isAfterMaxTime)
+                {
+                    // OKey
+                    this.result.isOk = true;
+                    this.result.msg = "Поле Дата - корректне";
+                }
+                else
+                {
+                    this.result.isOk = false;
+                    this.result.msg = "Вказана дата наступає раніше ніж можливий срок доставки!";
+                }
             } else {
                 this.result.isOk = false;
-                this.result.msg = "Поле Адреса містить некорректні символи. Дозволено - лише літери.";
+                this.result.msg = "Поле Дата містить некорректні символи або невірний формат.";
               
             }
         }
@@ -396,6 +407,48 @@ class validFormClass {
         console.error(error);
         this.result.isOk = false;
         this.result.msg = "Виникла невідома помилка при валідації поля Імʼя";
+        return this.result;
+      }
+    }
+
+    async checkTime(time) {
+        this.result = {};
+      try {
+        // проверяем пустое поле или нет
+        if (time === undefined || time === null) {
+            this.result.isOk = false;
+            this.result.msg  = "Поле Час - порожнє!";
+        }
+        else if (time.trim().lenght === 0)
+        {
+            this.result.isOk = false;
+            this.result.msg  = "Поле Час - порожнє!";
+            
+        }
+        else
+        {
+            // разрешено только 9 - 19 диапозон чисел
+            const regex = /^(?:1[0-9]|9)$/;
+            const isValid = regex.test(time);
+            
+            if (isValid) {
+               
+               this.result.isOk = true;
+               this.result.msg = "Поле Час - корректне";
+               
+            } else {
+                this.result.isOk = false;
+                this.result.msg = "Поле Час містить некорректні символи або виходить за діапазон від 9 до 19";
+              
+            }
+        }
+
+        return this.result;
+        
+      } catch (error) {
+        console.error(error);
+        this.result.isOk = false;
+        this.result.msg = "Виникла невідома помилка при валідації поля Час";
         return this.result;
       }
     }

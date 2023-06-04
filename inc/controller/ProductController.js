@@ -208,7 +208,6 @@ class ProductController {
                                 beforTAXFree:  (config.freeTAX - allCartPrice)<0? 0:(config.freeTAX - allCartPrice),
                                 error: false,
                             }
-
                         }
                         else
                         {
