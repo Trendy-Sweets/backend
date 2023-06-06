@@ -41,7 +41,7 @@ class productClass {
             productGroupArray = {
               productgroupId: productgroup_id,
               productgroupName: productgroup_name,
-              productgroupFoto: productgroup_foto,
+              productgroupFoto: '/pic/'+productgroup_foto,
               productgroupMaxTime: productgroup_maxtime,
               productgorupMinPrice: 0,
               products: []
@@ -168,6 +168,7 @@ class productClass {
 
         if (temp.rowCount == 1)
         {
+          temp.rows[0].product_foto = '/pic/'+temp.rows[0].product_foto;
           const result = {
               msg:"ok",
               error: "",
@@ -289,7 +290,7 @@ class productClass {
               result_list.push({
                 productid:            row.productid,
                 name:                 row.name,
-                foto:                 row.foto,
+                foto:                 '/pic/'+row.foto,
                 price:                row.price,
                 maxtime:              row.maxtime,
               }); 
