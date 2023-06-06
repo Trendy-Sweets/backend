@@ -377,7 +377,7 @@ class validFormClass {
 
             const isValid = regex.test(date);
             const isValid2 = regex2.test(date);            
-            if (isValid && isValid2) {
+            if (isValid || isValid2) {
                 // проверяем чтоб указанная дата была позже текущей + maxtime
                 const currentDate = new Date();
                 const specifiedDate = new Date(date);
