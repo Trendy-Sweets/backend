@@ -1,4 +1,3 @@
-import { time } from "console";
 import region_list from '../lib/region.json' assert { type: "json" };
 import city_list from '../lib/city.json' assert { type: "json" };
 
@@ -372,11 +371,13 @@ class validFormClass {
         }
         else
         {
-            // 04.05.2023
+            // 04.05.2023 либо 03-05-2023
             const regex = /^(0[1-9]|[1-2]\d|3[01])\.(0[1-9]|1[0-2])\.\d{4}$/;
+            const regex2 = /^\d{2}-\d{2}-\d{4}$/;
+
             const isValid = regex.test(date);
-            
-            if (isValid) {
+            const isValid2 = regex2.test(date);            
+            if (isValid && isValid2) {
                 // проверяем чтоб указанная дата была позже текущей + maxtime
                 const currentDate = new Date();
                 const specifiedDate = new Date(date);

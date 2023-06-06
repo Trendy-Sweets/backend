@@ -9,6 +9,7 @@ class ClientController {
           if (!cookies.ts_login) {
             clientClass.IsLogin = false;
             clientClass.userIdNow = null;
+            clientClass.userName = null;
             return false;
           }
           // ts_login={"id": 2}; Path=/;
@@ -17,6 +18,7 @@ class ClientController {
           if (cookieValue.id === false) {
             clientClass.IsLogin = false;
             clientClass.userIdNow = null;
+            clientClass.userName = null;
             return false;
           }
     

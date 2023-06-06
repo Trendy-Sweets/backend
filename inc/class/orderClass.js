@@ -23,7 +23,7 @@ class orderClass {
           text: 'INSERT INTO order_list '+
                 '(clientid, order_adress, order_commclient, order_commadmin, order_priceall, status_payorder, status_ordergo, order_region, order_city, order_phone, delivery_date, delivery_time) '+
                 'VALUES ($1, $2, $3, $4, $5, 0, $6, $7, $8, $9, TO_DATE($10, \'DD.MM.YYYY\'), $11) RETURNING orderid;',
-          values: [clientid, form.adress, 'commit by client', 'commit admin - test order', allprice, status_new, form.region, form.city, form.phone, form.date, form.time]
+          values: [clientid, form.addres, 'commit by client', 'commit admin - test order', allprice, status_new, form.region, form.city, form.phone, form.data, form.time]
         };
         
        

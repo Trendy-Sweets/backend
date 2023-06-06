@@ -102,11 +102,11 @@ class OrderController {
                     isOk:false,
                     msg:''
                 },
-                adres:{
+                addres:{
                     isOk:false,
                     msg:''
                 },
-                date:{
+                data:{
                     isOk:false,
                     msg:''
                 },
@@ -147,11 +147,11 @@ class OrderController {
                     else
                     {
                             // собираем/проверяем POST параметры
-                            const {phone, region, city, adress, date, time} = req.body;
+                            const {phone, region, city, addres, data, time} = req.body;
 
-                            result.validForm.adres  = await validFormClass.checkAdress(adress);
+                            result.validForm.addres  = await validFormClass.checkAdress(addres);
                             result.validForm.phone  = await validFormClass.checkPhone(phone);
-                            result.validForm.date   = await validFormClass.checkDate(date, maxTime.maxTime);
+                            result.validForm.data   = await validFormClass.checkDate(data, maxTime.maxTime);
                             result.validForm.time   = await validFormClass.checkTime(time); 
                             result.validForm.region = await validFormClass.checkRegion(region);
                             result.validForm.city   = await validFormClass.checkCity(city, region);
@@ -166,8 +166,8 @@ class OrderController {
                                     phone: phone,
                                     region: region,
                                     city: city,
-                                    adress: adress,
-                                    date: date,
+                                    addres: addres,
+                                    data: data,
                                     time: time
                                 }
                                 //console.log('Form - ' + dataForm);
