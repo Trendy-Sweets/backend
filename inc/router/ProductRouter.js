@@ -24,6 +24,8 @@ const rout = [
     { method: 'post', path: '/register',                handler: ClientController.postSignIn },
     // страница авторизации - отправка к нам формы с логином и паролем
     { method: 'post',  path: '/login',                  handler: ClientController.postLogIn },
+    // выход - удаление авторизации (куки)
+    { method: 'get', path: '/logout',                   handler: ClientController.getLogout },
     // страница - корзина  ---- получаем куку с перечнем продуктов и выдаем по ним инфу
     { method: 'get', path: '/cart',                     handler: ProductController.getProductInCart},
     // страница оформления заказа  --- дакем данные по текущей корзине и статусу атворизации клиента

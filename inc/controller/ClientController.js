@@ -100,19 +100,6 @@ class ClientController {
         }
     }
 
-    
-    // update CLient INFO
-    async putLogin(req, res) {
-        try {
-            const {idClient, clientInfo} = req.params;
-            res.json('Update Info for Client with ID - '+idClient);
-
-
-        } catch (error) {
-            console.log(error);
-            res.status(500).json(error.message);
-        }
-    }
      // регистрация клиента - получаем данные в пост-массиве
     async postSignIn(req, res) {
         try {
@@ -172,6 +159,17 @@ class ClientController {
 
 
         } catch (error) {
+            console.log(error);
+            res.status(500).json(error.message);
+        }
+    }
+
+    async getLogout(req, res) {
+        try {
+            // для выхода - тупо удаляем куку
+            res.clearCookie('ts_login');
+            res.json("ok");
+        }  catch (error) {
             console.log(error);
             res.status(500).json(error.message);
         }
