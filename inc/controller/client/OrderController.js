@@ -1,13 +1,13 @@
-import clientClass from '../class/clientClass.js';
-import OrderClass from '../class/orderClass.js';
-import productClass from '../class/productClass.js';
-import validFormClass from '../class/validFormClass.js';
+import clientClass from '../../class/client/clientClass.js';
+import OrderClass from '../../class/client/orderClass.js';
+import productClass from '../../class/client/productClass.js';
+import validFormClass from '../../class/global/validFormClass.js';
 
 
-import config from '../../config.json' assert { type: "json" };
-import region_list from '../lib/region.json' assert { type: "json"};
-import city_list  from '../lib/city.json' assert {type: "json"};
-import orderClass from '../class/orderClass.js';
+import config from '../../../config.json' assert { type: "json" };
+import region_list from '../../lib/region.json' assert { type: "json"};
+import city_list  from '../../lib/city.json' assert {type: "json"};
+import orderClass from '../../class/client/orderClass.js';
 
 class OrderController {
    

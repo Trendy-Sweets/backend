@@ -1,5 +1,5 @@
-import region_list from '../lib/region.json' assert { type: "json" };
-import city_list from '../lib/city.json' assert { type: "json" };
+import region_list from '../../lib/region.json' assert { type: "json" };
+import city_list from '../../lib/city.json' assert { type: "json" };
 
 class validFormClass {
   

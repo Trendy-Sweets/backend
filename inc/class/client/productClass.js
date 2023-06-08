@@ -1,5 +1,5 @@
 import { query } from 'express';
-import { connDB } from '../../index.js';
+import { connDB } from '../../../index.js';
 class productClass {
     async getProductGroup_list() {
       try {

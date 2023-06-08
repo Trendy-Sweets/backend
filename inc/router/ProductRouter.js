@@ -1,7 +1,7 @@
 import Router from 'express';
-import ProductController from '../controller/ProductController.js';
-import ClientController from '../controller/ClientController.js';
-import OrderController from '../controller/OrderController.js';
+import ProductController from '../controller/client/ProductController.js';
+import ClientController from '../controller/client/ClientController.js';
+import OrderController from '../controller/client/OrderController.js';
 
 const router = new Router;
 

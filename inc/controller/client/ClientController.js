@@ -1,5 +1,5 @@
-import clientClass from '../class/clientClass.js';
-import validFormClass from '../class/validFormClass.js';
+import clientClass from '../../class/client/clientClass.js';
+import validFormClass from '../../class/global/validFormClass.js';
 import { parse } from 'cookie';
 
 class ClientController {

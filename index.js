@@ -1,7 +1,9 @@
 import config from './config.json' assert { type: "json" };
 import express, { json } from 'express';
 import pg from 'pg';
-import router from './inc/router/ProductRouter.js';
+import routerProduct from './inc/router/ProductRouter.js';
+import routerAdmin from './inc/router/AdminRouter.js';
+import routerExecuter from './inc/router/ExecuteRouter.js';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 
@@ -15,7 +17,10 @@ const app = express();
 app.use(express.json());//что бы экспресс мог понят json формат
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/api', router);
+
+app.use('/api/admin', routerAdmin);
+app.use('api/execute', routerExecuter);
+app.use('/api', routerProduct);
 
 
 

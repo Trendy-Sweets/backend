@@ -1,4 +1,4 @@
-import { connDB } from '../../index.js';
+import { connDB } from '../../../index.js';
 class sloganClass {
   
     async getSlogan() {

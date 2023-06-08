@@ -1,8 +1,8 @@
-import productClass from '../class/productClass.js';
-import sloganClass from '../class/sloganClass.js';
-import clientClass from '../class/clientClass.js';
-import validFormClass from '../class/validFormClass.js';
-import config from '../../config.json' assert { type: "json" };
+import productClass from '../../class/client/productClass.js';
+import sloganClass from '../../class/client/sloganClass.js';
+import clientClass from '../../class/client/clientClass.js';
+import validFormClass from '../../class/global/validFormClass.js';
+import config from '../../../config.json' assert { type: "json" };
 
 class ProductController {
     async getMainPage(req, res) {
