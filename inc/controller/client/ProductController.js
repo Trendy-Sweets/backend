@@ -6,7 +6,8 @@ import config from '../../../config.json' assert { type: "json" };
 
 class ProductController {
     async getMainPage(req, res) {
-        console.log('get main page ...');
+        //console.log('get main page ...');
+        console.log(this);
         try {
         
             const result = await sloganClass.getSlogan();
@@ -16,7 +17,7 @@ class ProductController {
                 clientId: clientClass.userIdNow,
                 clientName: clientClass.userName
             };
-            const cart       = {
+            let cart       = {
                 allCartPrice: 0,
                 allProductCount: 0
             };
@@ -37,11 +38,12 @@ class ProductController {
             // если  .msg ==  error  - то были проблемы с получением данных
             // текст ошибки лежит в products.error
             // *** смотрим корзину
+            
             const temp = await validFormClass.validCookieCart(req.cookies.cart);
             if (temp.isOk)
             { // с кукой все ок
               // значит все ключи - цифры // уже ок - можно передавать на обработку
-                const cartItems = await JSON.parse(req.cookies.cart);
+                const cartItems = await JSON.parse(cookies_cart);
                 // получаем инфу о продуктах
                 const id_list = Object.keys(cartItems);
                 let product_info_rows = await productClass.getProductListByListId(id_list);
@@ -87,6 +89,18 @@ class ProductController {
             res.status(500).json(error.message);
         }
     }
+
+    async checkNowCart (cookies_cart)
+    {
+        let cart = {
+            allCartPrice: 0,
+            allProductCount: 0
+        };
+            
+
+        return cart;
+    };
+
     // Страница товара (новый вариант)
     // Выводим инфу о товара с его айдишником и сопровождаем массивов других вариаций товарв из его группы
     async getProductInfoById(req, res)
@@ -96,20 +110,58 @@ class ProductController {
             console.log('idProduct = '+ idProduct);
             const temp_productInfo = await productClass.getProductInfoById(idProduct);
             
-            
             var tosend = {};
-
 
             if (temp_productInfo.msg == 'ok')
             {
-                
                 // получем список других товаров из этой же группы
                 //console.log('nomer category =  '+temp_productInfo.toReturn.groupid);
                 const temp_list  = await productClass.getProductsListInGroup(temp_productInfo.toReturn.groupid);
-                
+                let cart = {};
+
+                const temp = await validFormClass.validCookieCart(req.cookies.cart);
+                if (temp.isOk)
+                { // с кукой все ок
+                // значит все ключи - цифры // уже ок - можно передавать на обработку
+                    const cartItems = await JSON.parse(req.cookies.cart);
+                    // получаем инфу о продуктах
+                    const id_list = Object.keys(cartItems);
+                    let product_info_rows = await productClass.getProductListByListId(id_list);
+
+                    if (!product_info_rows.error)
+                    {
+                        let allCartPrice = 0;
+                        let countProduct = 0;
+                        const modifiedToReturn = product_info_rows.toReturn.map(item => {
+                                    
+                                    countProduct += cartItems[item.productid];
+                                    allCartPrice += item.price * cartItems[item.productid];
+                                    return { ...item};
+                        });
+                                
+                        cart.allCartPrice    = allCartPrice;
+                        cart.allProductCount = countProduct;
+
+                    }
+                    else
+                    {
+                        cart.allCartPrice    = 0;
+                        cart.allProductCount = 0;
+                    }
+                }
+                else
+                {
+                    cart.allCartPrice    = 0;
+                    cart.allProductCount = 0;
+                }
+
                 tosend = {
                     prtoductInfo: temp_productInfo.toReturn,
                     products: temp_list.toReturn, //array
+                    cart: {
+                        allCartPrice: cart.allCartPrice,
+                        allProductCount: cart.allProductCount
+                    },
                     error: false,
                     errorMSG: "",
                 };
@@ -123,6 +175,10 @@ class ProductController {
                     prtoductInfo: {},
                     products: {}, 
                     error: true,
+                    cart: {
+                        allCartPrice: 0,
+                        allProductCount: 0
+                    },
                     errorMSG: temp_productInfo.error,
                 };
                res.json(tosend)
