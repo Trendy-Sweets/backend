@@ -43,7 +43,7 @@ class ProductController {
             if (temp.isOk)
             { // с кукой все ок
               // значит все ключи - цифры // уже ок - можно передавать на обработку
-                const cartItems = await JSON.parse(cookies_cart);
+                const cartItems = await JSON.parse(req.cookies.cart);
                 // получаем инфу о продуктах
                 const id_list = Object.keys(cartItems);
                 let product_info_rows = await productClass.getProductListByListId(id_list);
