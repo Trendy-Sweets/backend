@@ -81,7 +81,7 @@ class clientClass {
           else
           {
               // сравниваем пароли 
-              console.log(client_arr.password, result.rows[0].password);
+              //console.log(client_arr.password, result.rows[0].password);
               const compareP =  await this.comparePasswords(client_arr.password, result.rows[0].password);
 
 
@@ -108,10 +108,10 @@ class clientClass {
         const isMatch = await bcrypt.compare(plainPassword, hashedPassword);
         
         if (isMatch) {
-          console.log('Пароли совпадают');
+          //console.log('Пароли совпадают');
           return true;
         } else {
-          console.log('Пароли не совпадают');
+          //console.log('Пароли не совпадают');
           return false;
         }
       } catch (error) {

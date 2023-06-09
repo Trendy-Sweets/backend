@@ -32,6 +32,8 @@ const rout = [
     { method: 'get', path: '/cart/addOrderForm',        handler: OrderController.getAddFormInfo},
     // рпием данных с формы оформления заказа
     { method: 'post', path: '/order/add',               handler: OrderController.addNewOrder},
+    // списко заказов со статусами
+    { method: 'get', path: '/order/list',               handler: OrderController.getOrderListByClient},
 
     //  оформление заказа - передают POST массив с данными о заказе и куку с перечнем продуктов в корзине
     //{ method: 'post', path: '/'}

@@ -61,6 +61,93 @@ class orderClass {
       }
     }
 
+    async getOrderListByClientId(clientId)
+    {
+      let result = {
+        toReturn:{},
+        error:false,
+        errorMSG: ''
+      };
+
+      try {
+          const query = {
+            text:   'SELECT order_list.orderid      AS orderid, '+
+                    '       order_list.order_city   AS city, '+
+                    '       order_list.delivery_date AS date_delivery, '+
+                    '       order_list.delivery_time AS time_delivery, '+
+                    '       order_list.order_priceall AS allprice, '+
+                    '       order_list.status_payorder AS pay_order, '+
+                    '       order_status_list.status_text AS status_order '+
+                    ' FROM order_list '+
+                    ' RIGHT JOIN order_status_list ON order_list.status_ordergo = order_status_list.statusid '+
+                    ' WHERE order_list.clientid = $1',
+            values: [clientId]
+            };
+
+          const temp = await connDB.query(query);
+          //console.log(temp.rows[0]);
+          if (temp.rowCount > 0)
+          {
+            result.toReturn = temp.rows;
+            result.error = false;
+            result.errorMSG = '';
+          }
+          else
+          {
+            result.error = true;
+            result.errorMSG = 'Замовлення відустні';
+          }
+
+          return result;
+          
+      }
+      catch(err){
+        console.log(err);
+        return err;
+      }
+    }
+
+    async getProductsInOrder(orderId)
+    {
+      let result = {
+        toReturn:{},
+        error:false,
+        errorMSG: ''
+      };
+
+      try {
+          const query = {
+            text: 'SELECT OP.product_count AS product_count, '+
+                  '       PR.product_color AS product_color ' +
+                  'FROM order_product AS OP ' +
+                  'RIGHT JOIN product AS PR ON OP.productorderid = PR.productid '+
+                  'WHERE OP.orderid = $1',
+            values: [orderId]
+            };
+
+          const temp = await connDB.query(query);
+          //console.log(temp.rows[0]);
+          if (temp.rowCount > 0)
+          {
+            result.toReturn = temp.rows;
+            result.error = false;
+            result.errorMSG = '';
+          }
+          else
+          {
+            result.error = true;
+            result.errorMSG = 'Не знайшли продуктів в замовленні';
+          }
+
+          return result;
+          
+      }
+      catch(err){
+        console.log(err);
+        return err;
+      }
+    }
+
   }
   
   export default new orderClass();

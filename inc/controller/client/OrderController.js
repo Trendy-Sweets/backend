@@ -2,7 +2,7 @@ import clientClass from '../../class/client/clientClass.js';
 import OrderClass from '../../class/client/orderClass.js';
 import productClass from '../../class/client/productClass.js';
 import validFormClass from '../../class/global/validFormClass.js';
-
+import moment from 'moment';
 
 import config from '../../../config.json' assert { type: "json" };
 import region_list from '../../lib/region.json' assert { type: "json"};
@@ -244,18 +244,70 @@ class OrderController {
         }
     }
  
-    //  добавление в куки-файл - ts_cart - еще одного товара
-    async addProductIdToCart_Cookies(req, res) {
-        try { 
-            const {idOrder,StatusBuy} = req.params;
-          
-            res.json('Обновили статус оплаты заказа № ' + idOrder);
+    async getOrderListByClient(req, res)
+    {
+        let result = {
+            сlient: {
+                IsLogin: clientClass.IsLogin,
+                clientId: clientClass.userIdNow,
+                clientName: clientClass.userName
+            },
+            order_list: {},
+            error: false,
+            errorMSG:""
+        }
+
+        try {
+            
+            if (clientClass.IsLogin)
+            {
+                console.log('OK LOGIN - GET ORDER LIST ')
+                const temp = await orderClass.getOrderListByClientId(clientClass.userIdNow);    
+                if (temp.error)
+                {
+                    result.error = true;
+                    result.errorMSG = temp.errorMSG;
+                }
+                else
+                {
+                    result.order_list = temp.toReturn;
+
+                    for (let i = 0; i < result.order_list.length; i++) 
+                    {
+                        result.order_list[i].orderid       = result.order_list[i].orderid.toString().padStart(6, '0');
+                        result.order_list[i].city          = city_list[config.default_params.region][result.order_list[i].city];
+                        result.order_list[i].date_delivery = moment(result.order_list[i].date_delivery).format('DD.MM.YYYY').toString() + ' ' + result.order_list[i].time_delivery + ':00';
+                        
+                        const temp = await orderClass.getProductsInOrder(result.order_list[i].orderid);
+                        
+                        result.order_list[i].product_count = 0;
+
+                        temp.toReturn.map((product) => {
+                            result.order_list[i].product_count += product.product_count;
+                        });
+                        
+                        result.order_list[i]["products"]      = temp.toReturn;
+                        
+                        delete result.order_list[i].time_delivery;
+
+                    };
+                      
+                }
+            }
+            else
+            {
+                result.error = true;
+                result.errorMSG = 'Ви не авторизовані для перегляду замовлень';
+            }
+
+            res.json(result);
 
         } catch (error) {
             console.log(error);
             res.status(500).json(error.message);
         }
     }
+
 }
 
 export default new OrderController();
