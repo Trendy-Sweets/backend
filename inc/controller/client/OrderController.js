@@ -261,7 +261,7 @@ class OrderController {
             
             if (clientClass.IsLogin)
             {
-                console.log('OK LOGIN - GET ORDER LIST ')
+                //console.log('OK LOGIN - GET ORDER LIST ')
                 const temp = await orderClass.getOrderListByClientId(clientClass.userIdNow);    
                 if (temp.error)
                 {
@@ -274,19 +274,27 @@ class OrderController {
 
                     for (let i = 0; i < result.order_list.length; i++) 
                     {
-                        result.order_list[i].orderid       = result.order_list[i].orderid.toString().padStart(6, '0');
                         result.order_list[i].city          = city_list[config.default_params.region][result.order_list[i].city];
                         result.order_list[i].date_delivery = moment(result.order_list[i].date_delivery).format('DD.MM.YYYY').toString() + ' ' + result.order_list[i].time_delivery + ':00';
                         
-                        const temp = await orderClass.getProductsInOrder(result.order_list[i].orderid);
+                        const temp2 = await orderClass.getProductsInOrder(result.order_list[i].orderid);
                         
                         result.order_list[i].product_count = 0;
 
-                        temp.toReturn.map((product) => {
-                            result.order_list[i].product_count += product.product_count;
-                        });
+                        if (Array.isArray(temp2.toReturn)) 
+                        {
+                            temp2.toReturn.map((product) => {
+                                result.order_list[i].product_count += product.product_count;
+                            });
+                            result.order_list[i]["products"]      = temp2.toReturn;
+                        }
+                        else
+                        {
+                            result.order_list[i].product_count = 0;
+                            result.order_list[i]["products"]      = [];   
+                        }
                         
-                        result.order_list[i]["products"]      = temp.toReturn;
+                        result.order_list[i].orderid       = result.order_list[i].orderid.toString().padStart(6, '0');
                         
                         delete result.order_list[i].time_delivery;
 

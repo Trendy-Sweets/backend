@@ -80,8 +80,8 @@ class orderClass {
                     '       order_status_list.status_text AS status_order, '+
                     '       order_status_list.status_cod AS status_cod ' +
                     ' FROM order_list '+
-                    ' RIGHT JOIN order_status_list ON order_list.status_ordergo = order_status_list.statusid '+
-                    ' WHERE order_list.clientid = $1',
+                    ' LEFT JOIN order_status_list ON order_list.status_ordergo = order_status_list.statusid '+
+                    ' WHERE order_list.clientid = $1 ;',
             values: [clientId]
             };
 
@@ -111,7 +111,7 @@ class orderClass {
     async getProductsInOrder(orderId)
     {
       let result = {
-        toReturn:{},
+        toReturn:[],
         error:false,
         errorMSG: ''
       };
@@ -121,16 +121,17 @@ class orderClass {
             text: 'SELECT OP.product_count AS product_count, '+
                   '       PR.product_color AS product_color ' +
                   'FROM order_product AS OP ' +
-                  'RIGHT JOIN product AS PR ON OP.productorderid = PR.productid '+
-                  'WHERE OP.orderid = $1',
+                  'LEFT JOIN product AS PR ON OP.productorderid = PR.productid '+
+                  'WHERE OP.orderid = $1 ;',
             values: [orderId]
             };
-
+          //console.log('order ID = '+ orderId + ' || SQL - '+query.text );
           const temp = await connDB.query(query);
           //console.log(temp.rows[0]);
           if (temp.rowCount > 0)
           {
             result.toReturn = temp.rows;
+            console.log('ROWS - '+ temp.rows);
             result.error = false;
             result.errorMSG = '';
           }
