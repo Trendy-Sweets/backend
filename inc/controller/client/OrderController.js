@@ -20,9 +20,9 @@ class OrderController {
             error:false,
             msgError: '',
             client: {
-                IsLogin: null,
-                clientId: null,
-                clientName: null
+                IsLogin: clientClass.IsLogin,
+                clientId: clientClass.userIdNow,
+                clientName: clientClass.userName
             },
             region: {
                 region_code: [config.default_params.region],
@@ -31,7 +31,7 @@ class OrderController {
             city: {
                 city_code: [config.default_params.city],
                 city_name: [city_list.DP.DP],
-            },
+            }, 
             
         };
 
