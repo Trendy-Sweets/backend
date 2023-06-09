@@ -77,7 +77,8 @@ class orderClass {
                     '       order_list.delivery_time AS time_delivery, '+
                     '       order_list.order_priceall AS allprice, '+
                     '       order_list.status_payorder AS pay_order, '+
-                    '       order_status_list.status_text AS status_order '+
+                    '       order_status_list.status_text AS status_order, '+
+                    '       order_status_list.status_cod AS status_cod ' +
                     ' FROM order_list '+
                     ' RIGHT JOIN order_status_list ON order_list.status_ordergo = order_status_list.statusid '+
                     ' WHERE order_list.clientid = $1',
