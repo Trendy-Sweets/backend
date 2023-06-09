@@ -131,7 +131,7 @@ class orderClass {
           if (temp.rowCount > 0)
           {
             result.toReturn = temp.rows;
-            console.log('ROWS - '+ temp.rows);
+            //console.log('ROWS - '+ temp.rows);
             result.error = false;
             result.errorMSG = '';
           }
