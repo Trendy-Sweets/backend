@@ -7,15 +7,15 @@ import config from '../../../config.json' assert { type: "json" };
 class ProductController {
     async getMainPage(req, res) {
         //console.log('get main page ...');
-        console.log(this);
+        let status_login = await clientClass.checkAuthorization(req.cookies); // Проверка авторизации 
         try {
         
             const result = await sloganClass.getSlogan();
             const products = await productClass.getProductGroup_list();
             const klient_arr = {
-                IsLogin: clientClass.IsLogin,
-                clientId: clientClass.userIdNow,
-                clientName: clientClass.userName
+                IsLogin: status_login.IsLogin,
+                clientId: status_login.userIdNow,
+                clientName: status_login.userName
             };
             let cart       = {
                 allCartPrice: 0,

@@ -5,16 +5,6 @@ import OrderController from '../controller/client/OrderController.js';
 
 const router = new Router;
 
-// Проверка авторизации один раз в главном роутере
-router.use((req, res, next) => {
-  const cookies = req.cookies;
-  ClientController.checkAuthorization(cookies); // Проверка авторизации 
-  
-  next(); // Переход к следующему маршруту
-});
-
-
-
 const rout = [
     // главная
     { method: 'get',  path: '/',                        handler: ProductController.getMainPage }, 

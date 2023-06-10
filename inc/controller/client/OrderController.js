@@ -14,15 +14,16 @@ class OrderController {
     // формируем данные для формы оформления заказа
     async getAddFormInfo(req, res) {
 
+        const status_login = await clientClass.checkAuthorization(req.cookies); // Проверка авторизации 
         let result = {
             products:'',
             allCartPrice:0,
             error:false,
             msgError: '',
             client: {
-                IsLogin: clientClass.IsLogin,
-                clientId: clientClass.userIdNow,
-                clientName: clientClass.userName
+                IsLogin: status_login.IsLogin,
+                clientId: status_login.userIdNow,
+                clientName: status_login.userName
             },
             region: {
                 region_code: [config.default_params.region],
@@ -59,9 +60,9 @@ class OrderController {
                     result.allCartPrice = allCartPrice;
                     result.error = false;
                     result.client = {
-                        IsLogin: clientClass.IsLogin,
-                        clientId: clientClass.userIdNow,
-                        clientName: clientClass.userName
+                        IsLogin: status_login.IsLogin,
+                        clientId: status_login.userIdNow,
+                        clientName: status_login.userName
                     };
 
                 }
@@ -84,11 +85,18 @@ class OrderController {
         }
     }
   // страница - оформление заказа / ПРИЕМ данных с формы
-    async addNewOrder(req, res) {
+    async addNewOrder(req, res) 
+    {
 
+        const status_login = await clientClass.checkAuthorization(req.cookies); // Проверка авторизации 
         let result = {
             isCreateOrder: false, // флаг создания записи в БД о заказе
             msgError: '',
+            client: {
+                IsLogin: status_login.IsLogin,
+                clientId: status_login.userIdNow,
+                clientName: status_login.userName
+            },
             validForm:{
                 phone:{
                     isOk:false,
@@ -127,10 +135,10 @@ class OrderController {
             { // с кукой все ок
                 
                 // проверяем авторизацию
-                if (clientClass.IsLogin)
+                if (status_login.IsLogin)
                 {
-                    const clientId = clientClass.userIdNow;
-                    const clientName = clientClass.userName;
+                    const clientId = status_login.userIdNow;
+                    const clientName = status_login.userName;
                     // значит все ключи - цифры // уже ок - можно передавать на обработку и авторизация ок
                     const cartItems = await JSON.parse(req.cookies.cart);
                     //console.log(cartItems);
@@ -181,6 +189,7 @@ class OrderController {
                                 else
                                 {
                                     result.isCreateOrder = true;
+                                    res.clearCookie('cart');
                                 }
                             }
                     }
@@ -204,20 +213,7 @@ class OrderController {
             res.status(500).json(err.message);
         }
     }
-    // клиент оформляет заказ - заполняет данные по доставке, дате и прочее
-    // принимаем вместе с перечнем продуктов в корзине и их количеством
-    async postCartProcessingToOrder(req, res) {
-        try {
-            const {ProductIdList,ProductCountList,ClietnInfo} = req.params;
-          
-            res.json('оформляем заказ и сохрпаняем его в БД');
-
-        } catch (error) {
-            console.log(error);
-            res.status(500).json(error.message);
-        }
-    }
-
+    
     // получение статуса заказа с номером 
     async getOrderStatus(req, res) {
         try {
@@ -246,11 +242,12 @@ class OrderController {
  
     async getOrderListByClient(req, res)
     {
+        const status_login = await clientClass.checkAuthorization(req.cookies); // Проверка авторизации 
         let result = {
             сlient: {
-                IsLogin: clientClass.IsLogin,
-                clientId: clientClass.userIdNow,
-                clientName: clientClass.userName
+                IsLogin: status_login.IsLogin,
+                clientId: status_login.userIdNow,
+                clientName: status_login.userName
             },
             order_list: {},
             error: false,
@@ -259,10 +256,10 @@ class OrderController {
 
         try {
             
-            if (clientClass.IsLogin)
+            if (status_login.IsLogin)
             {
                 //console.log('OK LOGIN - GET ORDER LIST ')
-                const temp = await orderClass.getOrderListByClientId(clientClass.userIdNow);    
+                const temp = await orderClass.getOrderListByClientId(status_login.userIdNow);    
                 if (temp.error)
                 {
                     result.error = true;

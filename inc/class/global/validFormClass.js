@@ -1,5 +1,6 @@
 import region_list from '../../lib/region.json' assert { type: "json" };
 import city_list from '../../lib/city.json' assert { type: "json" };
+import moment from 'moment';
 
 class validFormClass {
   
@@ -356,17 +357,17 @@ class validFormClass {
     }
     
     async checkDate(date, maxtime) {
-        this.result = {};
+        let result = {};
       try {
         // проверяем пустое поле или нет
         if (date === undefined || date === null) {
-            this.result.isOk = false;
-            this.result.msg  = "Поле Дата - порожнє!";
+            result.isOk = false;
+            result.msg  = "Поле Дата - порожнє!";
         }
         else if (date.trim().lenght === 0)
         {
-            this.result.isOk = false;
-            this.result.msg  = "Поле Дата - порожнє!";
+            result.isOk = false;
+            result.msg  = "Поле Дата - порожнє!";
             
         }
         else
@@ -380,35 +381,38 @@ class validFormClass {
             if (isValid || isValid2) {
                 // проверяем чтоб указанная дата была позже текущей + maxtime
                 const currentDate = new Date();
-                const specifiedDate = new Date(date);
+                //const specifiedDate = new Date(date);
+                const specifiedDate = moment(date, "DD-MM-YYYY").toDate();
                 
                 const futureDate = new Date(currentDate.getTime() + maxtime * 60 * 60 * 1000);
                 const isAfterMaxTime = specifiedDate > futureDate;
+
+                //console.log('data - '+ date + ' | time = '+ maxtime );
                 if (isAfterMaxTime)
                 {
                     // OKey
-                    this.result.isOk = true;
-                    this.result.msg = "Поле Дата - корректне";
+                    result.isOk = true;
+                    result.msg = "Поле Дата - корректне";
                 }
                 else
                 {
-                    this.result.isOk = false;
-                    this.result.msg = "Вказана дата наступає раніше ніж можливий срок доставки!";
+                    result.isOk = false;
+                    result.msg = "Вказана дата наступає раніше ніж можливий срок доставки!";
                 }
             } else {
-                this.result.isOk = false;
-                this.result.msg = "Поле Дата містить некорректні символи або невірний формат.";
+                result.isOk = false;
+                result.msg = "Поле Дата містить некорректні символи або невірний формат.";
               
             }
         }
 
-        return this.result;
+        return result;
         
       } catch (error) {
-        console.error(error);
-        this.result.isOk = false;
-        this.result.msg = "Виникла невідома помилка при валідації поля Імʼя";
-        return this.result;
+            console.error(error);
+            result.isOk = false;
+            result.msg = "Виникла невідома помилка при валідації поля Імʼя";
+        return result;
       }
     }
 

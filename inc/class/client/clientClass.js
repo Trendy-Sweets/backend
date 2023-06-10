@@ -4,9 +4,9 @@ import bcrypt from 'bcrypt';
 class clientClass {
   
   constructor() {
-    this.IsLogin = false;   // если True - значит авторизован
-    this.userIdNow = null; // тут будет id usera если он авторизован
-    this.userName = ""; // имя авторизованного клиента
+    //this.IsLogin = false;   // если True - значит авторизован
+   // this.userIdNow = null; // тут будет id usera если он авторизован
+   // this.userName = ""; // имя авторизованного клиента
   }
 
     async checkEmailInDB(email) {
@@ -117,6 +117,43 @@ class clientClass {
       } catch (error) {
         console.error(error);
         return false;
+      }
+    }
+
+    async checkAuthorization(cookies) 
+    { // проверяем авторизацию по куки ts_login   // ts_login={"id": 2}; Path=/;
+      let result = {};
+      try {
+        if (!cookies.ts_login) {
+          result.IsLogin = false;
+          result.userIdNow = null;
+          result.userName = null;
+          
+        }
+        else
+        {
+          const cookieValue = await JSON.parse(cookies.ts_login);
+            
+          if (cookieValue.id === false) {
+            result.IsLogin = false;
+            result.userIdNow = null;
+            result.userName = null;
+            
+          }
+    
+          if (typeof cookieValue.id === 'number') {
+            result.IsLogin = true;
+            result.userIdNow = cookieValue.id;
+            result.userName = cookieValue.name;
+            
+          }
+        }
+       
+        return result;
+        
+      } catch (error) {
+        console.error(error);
+        return 'Error in clientClass';
       }
     }
 }

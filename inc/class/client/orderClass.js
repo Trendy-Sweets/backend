@@ -121,11 +121,11 @@ class orderClass {
             text: 'SELECT OP.product_count AS product_count, '+
                   '       PR.product_color AS product_color ' +
                   'FROM order_product AS OP ' +
-                  'LEFT JOIN product AS PR ON OP.productorderid = PR.productid '+
+                  'LEFT JOIN product AS PR ON OP.productid = PR.productid '+
                   'WHERE OP.orderid = $1 ;',
             values: [orderId]
             };
-          //console.log('order ID = '+ orderId + ' || SQL - '+query.text );
+          console.log('order ID = '+ orderId + ' || SQL - '+query.text );
           const temp = await connDB.query(query);
           //console.log(temp.rows[0]);
           if (temp.rowCount > 0)

@@ -4,35 +4,6 @@ import { parse } from 'cookie';
 
 class ClientController {
    
-    async checkAuthorization(cookies) { // проверяем авторизацию по куки ts_login
-        try {
-          if (!cookies.ts_login) {
-            clientClass.IsLogin = false;
-            clientClass.userIdNow = null;
-            clientClass.userName = null;
-            return false;
-          }
-          // ts_login={"id": 2}; Path=/;
-          const cookieValue = await JSON.parse(cookies.ts_login);
-          
-          if (cookieValue.id === false) {
-            clientClass.IsLogin = false;
-            clientClass.userIdNow = null;
-            clientClass.userName = null;
-            return false;
-          }
-    
-          if (typeof cookieValue.id === 'number') {
-            clientClass.IsLogin = true;
-            clientClass.userIdNow = cookieValue.id;
-            clientClass.userName = cookieValue.name;
-            return true;
-          }
-        } catch (error) {
-          console.error(error);
-          return 'Error in clientClass';
-        }
-      }
     // nсраница авторизации !!!
     async postLogIn(req, res) {
         var result = {
@@ -146,7 +117,14 @@ class ClientController {
             if (result['okForm']){
                 const paramAdd = {'name': name, 'email': email, 'password': password};
                 //console.log(paramAdd.name);
-                result['okAddToDB'] = clientClass.addClientToDB(paramAdd);
+                if (clientClass.addClientToDB(paramAdd))
+                {
+                    result['okAddToDB'] = true;
+                }
+                else
+                {
+                    result['okAddToDB'] = false;
+                }
 
                 // если успешно - ставим куку что мы авторизованы
                 // - не ставим, он идет на авторизацию и там уже ставим
