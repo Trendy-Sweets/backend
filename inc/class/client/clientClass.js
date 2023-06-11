@@ -4,15 +4,14 @@ import bcrypt from 'bcrypt';
 class clientClass {
   
   constructor() {
-    //this.IsLogin = false;   // если True - значит авторизован
-   // this.userIdNow = null; // тут будет id usera если он авторизован
-   // this.userName = ""; // имя авторизованного клиента
+      //this.IsLogin = false;   // если True - значит авторизован
+    // this.userIdNow = null; // тут будет id usera если он авторизован
+    // this.userName = ""; // имя авторизованного клиента
   }
 
     async checkEmailInDB(email) {
       // проверка почты на наличие в базе данных
       try {
-
         const query = {
           text: 'SELECT COUNT(email) as countemail FROM client WHERE email = $1',
           values: [email],
@@ -48,10 +47,10 @@ class clientClass {
             const result = await connDB.query(query);
 
             if (result.rowCount > 0) {
-              console.log('Новая запись успешно добавлена');
+              //console.log('Новая запись успешно добавлена');
               return true;
             } else {
-              console.log('Не удалось добавить новую запись');
+              //console.log('Не удалось добавить новую запись');
               return false;
             }
 

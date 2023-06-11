@@ -3,15 +3,8 @@ import bcrypt from 'bcrypt';
 
 class userAdminClass {
   
-  constructor() {
-    this.IsLogin = false;   // если True - значит авторизован
-    this.userIdNow = null; // тут будет id usera если он авторизован
-    this.userName = ""; // имя авторизованного клиента
-    this.userPosition = "";//lдолжность
-  }
-
     // авторизация - принимаем логин и прароль
-    async loginClient(client_arr) {
+    async loginAdmin(client_arr) {
       try {
           // достаем из БД данные по указанной почте
           const query = {
@@ -38,8 +31,7 @@ class userAdminClass {
               }
               else
               {
-                
-                return {isOk:true, msg:'Вдалий вхід', id:result.rows[0].clientid, name:result.rows[0].name, position:result.rows[0].position}; 
+                return {isOk:true, msg:'Вдалий вхід', id:result.rows[0].adminid, name:result.rows[0].name, position:result.rows[0].position}; 
               }
           }
           
@@ -89,6 +81,46 @@ class userAdminClass {
         }
       }
 
+      async checkAuthorization(cookies) 
+      { // проверяем авторизацию по куки ts_admin
+
+        let result = {};
+
+        try {
+          if (!cookies.ts_admin) {
+            result.IsLogin = false;
+            result.userIdNow = null;
+            result.userName = null;
+            result.userPosition = null;
+            
+          }
+          else
+          {
+            const cookieValue = await JSON.parse(cookies.ts_admin);
+            
+            if (cookieValue.id === false) {
+              result.IsLogin = false;
+              result.userIdNow = null;
+              result.userName = null;
+              result.userPosition = null;
+              
+            }
+      
+            if (typeof cookieValue.id === 'number') {
+              result.IsLogin = true;
+              result.userIdNow = cookieValue.id;
+              result.userName = cookieValue.name;
+              result.userPosition = cookieValue.position;
+              
+            }
+          }
+          
+          return result;
+        } catch (error) {
+          console.error(error);
+          return 'Error in clientClass';
+        }
+      }
 
 }
   

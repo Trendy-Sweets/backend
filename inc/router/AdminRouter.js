@@ -1,25 +1,22 @@
 import Router from 'express';
 import UserController from '../controller/admin/UserController.js';
+import WorkController from '../controller/admin/WorkController.js';
+import executerClass from '../class/admin/executerClass.js';
 
 
 const routerAdmin = new Router;
-
-// Проверка авторизации один раз в главном роутере
-routerAdmin.use((req, res, next) => {
-  const cookies = req.cookies;
-  UserController.checkAuthorization(cookies); // Проверка авторизации 
-  
-  next(); // Переход к следующему маршруту
-});
 
 // /api/admin  ++++++++ 
 
 const rout = [
     // главная
    // { method: 'get',  path: '/',                        handler: '' }, 
-    { method: 'post',  path: '/login',                  handler: UserController.postLogIn },
-    { method: 'get', path: '/logout',                   handler: UserController.getLogout },
-     ];
+   // авторизация
+    { method: 'post',   path: '/login',                     handler: UserController.postLogIn },
+    { method: 'get',    path: '/logout',                    handler: UserController.getLogout },
+    // главная
+    { method: 'get',    path: '/',                          handler: WorkController.getMainAdminPage },
+];
   
 
   rout.forEach((route) => {

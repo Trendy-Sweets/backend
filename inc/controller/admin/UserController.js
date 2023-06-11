@@ -3,40 +3,10 @@ import userAdminClass from '../../class/admin/userAdminClass.js';
 
 class ClientController {
    
-    async checkAuthorization(cookies) { // проверяем авторизацию по куки ts_admin
-        try {
-          if (!cookies.ts_login) {
-            userAdminClass.IsLogin = false;
-            userAdminClass.userIdNow = null;
-            userAdminClass.userName = null;
-            userAdminClass.userPosition = null;
-            return false;
-          }
-          // ts_login={"id": 2}; Path=/;
-          const cookieValue = await JSON.parse(cookies.ts_login);
-          
-          if (cookieValue.id === false) {
-            userAdminClass.IsLogin = false;
-            userAdminClass.userIdNow = null;
-            userAdminClass.userName = null;
-            userAdminClass.userPosition = null;
-            return false;
-          }
     
-          if (typeof cookieValue.id === 'number') {
-            userAdminClass.IsLogin = true;
-            userAdminClass.userIdNow = cookieValue.id;
-            userAdminClass.userName = cookieValue.name;
-            userAdminClass.userPosition = cookieValue.position;
-            return true;
-          }
-        } catch (error) {
-          console.error(error);
-          return 'Error in clientClass';
-        }
-      }
     // nсраница авторизации !!!
     async postLogIn(req, res) {
+
         var result = {
             'email':{},
             'password':{},
@@ -77,7 +47,7 @@ class ClientController {
             if (result['okForm'])
             {
                 const paramAdd = {'email': email, 'password': password};
-                result['okLogin'] = await userAdminClass.loginClient(paramAdd);
+                result['okLogin'] = await userAdminClass.loginAdmin(paramAdd);
 
                 // если успешно - ставим куку что мы авторизованы
                 const cookieData = { id: result['okLogin'].id, name: result['okLogin'].name, position: result['okLogin'].position };
@@ -115,6 +85,7 @@ class ClientController {
             res.status(500).json(error.message);
         }
     }
+
 }
 
 
