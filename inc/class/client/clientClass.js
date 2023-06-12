@@ -155,6 +155,34 @@ class clientClass {
         return 'Error in clientClass';
       }
     }
+
+    // обратная связь - сохраняем в базу сообщение
+    async saveMessageFromUser(msg_arr) 
+    {
+      
+      try {
+        const query = {
+          text: 'INSERT INTO client_message '+
+                '(fio,          phone,           email,         message,        rules)'+
+                'VALUES ($1,      $2,             $3,             $4,              $5);',
+          values: [msg_arr.fio, msg_arr.phone, msg_arr.email, msg_arr.message, msg_arr.rules],
+          rowMode: 'object'
+        }
+
+        const result = await connDB.query(query);
+        if (result.rowCount > 0) {
+          //console.log('Новая запись успешно добавлена');
+          return true;
+        } else {
+          //console.log('Не удалось добавить новую запись');
+          return false;
+        }     
+        
+      } catch (error) {
+        console.error(error);
+        return false;
+      }
+    }
 }
   
   export default new clientClass();

@@ -152,6 +152,62 @@ class ClientController {
             res.status(500).json(error.message);
         }
     }
+
+    // топравка сообщение от посетителя для администрации
+    async postSendMessage(req, res) {
+        try {
+            const { fio, phone, email, message, rules } = req.body;
+            
+            var result = {
+                
+                fio:{},
+                email:{},
+                phone:{},
+                message:{},
+                
+                
+            };
+            
+            result['fio']       = await validFormClass.checkName(fio);
+            result['email']     = await validFormClass.checkEmail(email);
+            result['phone']     = await validFormClass.checkPhone(phone);
+            result['message']   = await validFormClass.checkText(message);
+            //result['rules'] = await validFormClass.checkTrue(rules);
+            
+          
+            const okForm = Object.values(result).every(field => field.isOk);
+          
+            // добавляем клиента в базу данных
+            if (okForm)
+            {
+                const paramAdd = {'fio':fio, 'email':email, 'phone':phone, 'message':message, 'rules':rules};
+                //console.log(paramAdd.name);
+                if (clientClass.saveMessageFromUser(paramAdd))
+                {
+                    result.okSend = true;
+                }
+                else
+                {
+                   result.okSend = false;
+                   result.errorMSG = 'Виникла проблема при відправлені звернення на сервер';
+                }
+
+                
+            }
+            else {
+                result.okSend = false;
+                result.errorMSG = 'Не корректні дані в одному з полів форми';
+            }
+            
+            res.json(result);
+
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json(error.message);
+        }
+    }
+
 }
 
 

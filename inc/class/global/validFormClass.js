@@ -14,44 +14,44 @@ class validFormClass {
     }
 
     async checkName(name) {
-        this.result = {};
+       let result = {};
       try {
         // проверяем пустое поле или нет
         if (name === undefined || name === null) {
-            this.result.isOk = false;
-            this.result.msg  = "Поле Імʼя - порожнє!";
+            result.isOk = false;
+            result.msg  = "Поле Імʼя - порожнє!";
         }
         else if (name.trim().lenght === 0)
         {
-            this.result.isOk = false;
-            this.result.msg  = "Поле Імʼя - порожнє!";
+            result.isOk = false;
+            result.msg  = "Поле Імʼя - порожнє!";
             
         }
         else
         {
             //  проверка на запрещенные символы - разрешены только буквы лат и киррилица
-            const regex = /^[a-zA-Zа-яА-Я]+$/;
+            const regex = /^[\p{L}\s-]+$/u            ; //  /^[a-zA-Zа-яА-Я]+$/;
             const isValid = regex.test(name);
             
             if (isValid) {
                 // Поле `name` содержит только буквы латинского алфавита или кириллицы
-               this.result.isOk = true;
-               this.result.msg = "Поле імʼя - корректне";
+               result.isOk = true;
+               result.msg = "Поле імʼя - корректне";
                
             } else {
-                this.result.isOk = false;
-                this.result.msg = "Поле Імʼя містить некорректні символи. Дозволено - лише літери.";
+                result.isOk = false;
+                result.msg = "Поле Імʼя містить некорректні символи. Дозволено - лише літери.";
               
             }
         }
 
-        return this.result;
+        return result;
         
       } catch (error) {
         console.error(error);
-        this.result.isOk = false;
-        this.result.msg = "Виникла невідома помилка при валідації поля Імʼя";
-        return this.result;
+        result.isOk = false;
+        result.msg = "Виникла невідома помилка при валідації поля Імʼя";
+        return result;
       }
     }
 
@@ -356,6 +356,47 @@ class validFormClass {
       }
     }
     
+    async checkText(msg) {
+       let result = {};
+      try {
+        // проверяем пустое поле или нет
+        if (msg === undefined || msg === null) {
+            result.isOk = false;
+            result.msg  = "Поле порожнє!";
+        }
+        else if (msg.trim().lenght === 0)
+        {
+            result.isOk = false;
+            result.msg  = "Поле - порожнє!";
+            
+        }
+        else
+        {
+            //  проверка на запрещенные символы - разрешены только буквы лат и киррилица
+            const regex = /^[\p{L}\d\s.,\-/]+$/u;
+            const isValid = regex.test(msg);
+            
+            if (isValid) {
+               
+               result.isOk = true;
+               result.msg = "Поле - корректне";
+               
+            } else {
+                result.isOk = false;
+                result.msg = "Поле містить некорректні символи.";
+            }
+        }
+
+        return result;
+        
+      } catch (error) {
+        console.error(error);
+        this.result.isOk = false;
+        this.result.msg = "Виникла невідома помилка при валідації поля";
+        return this.result;
+      }
+    }
+
     async checkDate(date, maxtime) {
         let result = {};
       try {
@@ -454,6 +495,32 @@ class validFormClass {
         console.error(error);
         this.result.isOk = false;
         this.result.msg = "Виникла невідома помилка при валідації поля Час";
+        return this.result;
+      }
+    }
+
+    async checkTrue(rules) {
+        this.result = {};
+      try {
+        // проверяем пустое поле или нет
+        if (typeof rules === 'boolean' && rules === true)
+        {
+            this.result.isOk = true;
+            this.result.msg = 'все добре';
+        }
+        else
+        {
+            this.result.isOk = false;
+            this.result.msg = 'Має бути вибрано';
+        }
+
+        
+        return this.result;
+        
+      } catch (error) {
+        console.error(error);
+        this.result.isOk = false;
+        this.result.msg = "Виникла невідома помилка при валідації поля ";
         return this.result;
       }
     }

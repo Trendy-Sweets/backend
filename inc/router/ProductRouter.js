@@ -2,6 +2,7 @@ import Router from 'express';
 import ProductController from '../controller/client/ProductController.js';
 import ClientController from '../controller/client/ClientController.js';
 import OrderController from '../controller/client/OrderController.js';
+import clientClass from '../class/client/clientClass.js';
 
 const router = new Router;
 
@@ -24,6 +25,8 @@ const rout = [
     { method: 'post', path: '/order/add',               handler: OrderController.addNewOrder},
     // списко заказов со статусами
     { method: 'get', path: '/order/list',               handler: OrderController.getOrderListByClient},
+    // отправка сообщения для администрации
+    { method: 'post', path: '/message',                 handler:ClientController.postSendMessage },
 
     //  оформление заказа - передают POST массив с данными о заказе и куку с перечнем продуктов в корзине
     //{ method: 'post', path: '/'}
