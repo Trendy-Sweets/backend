@@ -1,19 +1,13 @@
 import Router from 'express';
+import WorkExecController from '../controller/executer/WorkExecController.js';
 
 
 const routerExecute = new Router;
 
-// Проверка авторизации один раз в главном роутере
-routerExecute.use((req, res, next) => {
-  const cookies = req.cookies;
-  ClientController.checkAuthorization(cookies); // Проверка авторизации 
-  
-  next(); // Переход к следующему маршруту
-});
-
-
-
 const rout = [
+    // аторизация 
+    { method: 'post',   path:'/login',                      handler:WorkExecController.postLogIn },
+    { method: 'get',    path: '/logout',                    handler: WorkExecController.getLogout },
     // главная
     //{ method: 'get',  path: '/',                        handler: '' }, 
     //{ method: 'post',  path: '/login',                  handler: '' },

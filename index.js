@@ -19,7 +19,7 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/api/admin', routerAdmin);
-app.use('api/execute', routerExecuter);
+app.use('/api/executer', routerExecuter);
 app.use('/api', routerProduct);
 
 
