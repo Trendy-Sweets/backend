@@ -18,6 +18,7 @@ class OrderController {
         let result = {
             products:'',
             allCartPrice:0,
+            beforTAXFree:0,
             error:false,
             msgError: '',
             client: {
@@ -58,6 +59,7 @@ class OrderController {
                     
                     result.products     = modifiedToReturn;
                     result.allCartPrice = allCartPrice;
+                    result.beforTAXFree =  (config.freeTAX - allCartPrice)<0? 0:(config.freeTAX - allCartPrice);
                     result.error = false;
                     result.client = {
                         IsLogin: status_login.IsLogin,
