@@ -1,6 +1,6 @@
-import { query } from 'express';
+
 import { connDB } from '../../../index.js';
-class productClass {
+class productAdminClass {
     async getProductGroup_list() {
       try {
         const query = {
@@ -262,4 +262,4 @@ class productClass {
 
   }
   
-  export default  new productClass();
+  export default  new productAdminClass();

@@ -3,6 +3,7 @@ import userAdminClass from '../../class/admin/userAdminClass.js';
 import executerClass from '../../class/admin/executerClass.js';
 import { parse } from 'cookie';
 import productAdminClass from '../../class/admin/productAdminClass.js';
+import orderAdminClass from '../../class/admin/orderAdminClass.js';
 
 class WorkController {
    
@@ -39,9 +40,12 @@ class WorkController {
                 // всего исполнителей которые готовы принимать заказа executer.allowed = 1 and executer.ready = 1
                 const countReady = await executerClass.getExecutersListReady();
 
-                result.executerWhait = countWhait;
-                result.executerAllowed = countAllowed;
-                result.executerReady = countReady;
+                const countOrderRun = await orderAdminClass.getCountOrderRun();
+
+                result.executerWhait    = countWhait;
+                result.executerAllowed  = countAllowed;
+                result.executerReady    = countReady;
+                result.orderRun         = countOrderRun.toReturn;
 
                 // всего заказов в работе
                 // всего выполнено заказов
