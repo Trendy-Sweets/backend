@@ -2,6 +2,7 @@ import validFormClass from '../../class/global/validFormClass.js';
 import userAdminClass from '../../class/admin/userAdminClass.js';
 import executerClass from '../../class/admin/executerClass.js';
 import { parse } from 'cookie';
+import productAdminClass from '../../class/admin/productAdminClass.js';
 
 class WorkController {
    
@@ -77,6 +78,53 @@ class WorkController {
         try {
             // для выхода - тупо удаляем куку
             const result = await executerClass.testsql();
+            res.json(result);
+        }  catch (error) {
+            console.log(error);
+            res.status(500).json(error.message);
+        }
+    }
+
+    // управление товарами - список групп и товаров
+    async getProductGroupList(req, res) 
+    {
+        const status_login = await userAdminClass.checkAuthorization(req.cookies);
+
+        let result = {
+            error: false,
+            errorMSG: '',
+            okLogin: {
+                isLogin: status_login.IsLogin,
+                userIdNow: status_login.userIdNow,
+                userName: status_login.userName,
+                userPosition: status_login.userPosition
+            },
+            products:{}
+        }
+
+        try {
+            if (status_login.IsLogin)
+            {
+                // надо получить обьект состощий из списка групп 
+                // а каждая такая группа включает обьект из списка продуктов этой группы
+                const temp = await productAdminClass.getProductGroup_list();
+
+                if (temp.error)
+                {
+                    result.error = true;
+                    result.errorMSG = temp.msg;
+                }
+                else
+                {
+                    result.error = false;
+                    result.products = temp.toReturn;
+                }
+            }
+            else
+            {і
+                result.error = true;
+                result.errorMSG = 'Ви маєте бути авторизованим';
+            }
             res.json(result);
         }  catch (error) {
             console.log(error);

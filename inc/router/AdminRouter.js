@@ -16,6 +16,8 @@ const rout = [
     { method: 'get',    path: '/logout',                    handler: UserController.getLogout },
     // главная
     { method: 'get',    path: '/',                          handler: WorkController.getMainAdminPage },
+    // управление товарами - главная
+    { method: 'get', path:'/products/', handler:WorkController.getProductGroupList },
 ];
   
 
