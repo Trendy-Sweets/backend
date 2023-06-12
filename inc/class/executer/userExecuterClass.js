@@ -119,6 +119,55 @@ class userExecClass {
         }
       }
 
+
+      async addClientToDB(client_arr) {
+        try {
+            const { email, phone, fio, password, repassword, addres, anketa_oldwork, anketa_stag, anketa_medkarta, anketa_year, anketa_child } = client_arr;
+              // Генерация хэша пароля
+              const saltRounds = 10; // Количество раундов соли
+              const hashedPassword = await bcrypt.hash(password, saltRounds);
+              //console.log(client_arr);
+              // Запрос на добавление записи в таблицу
+              const query = {
+                text: 'INSERT INTO executer (email, password, fio, phone, allowed, ready, addres) ' +
+                      'VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING executer_id',
+                values: [email, hashedPassword, fio, phone, 0, 0, addres]
+              };
+              
+              const result = await connDB.query(query);
+              
+              if (result.rowCount > 0) 
+              {
+                const executerId = result.rows[0].executer_id;
+                console.log('Создан новый executer с executer_id:', executerId);
+
+                const query2 = {
+                    text: 'INSERT INTO executer_anketa (executer_id, old_work_place, experience, medkarta, year, child) ' +
+                          'VALUES ($1, $2, $3, $4, $5, $6)',
+                    values: [executerId, anketa_oldwork, anketa_stag, anketa_medkarta, anketa_year, anketa_child]
+                  };
+                  const result2 = await connDB.query(query2);
+                  if (result2.rowCount > 0) 
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+              } else {
+                //console.log('Не удалось добавить новую запись');
+                return false;
+              }
+  
+        }
+        catch(error) 
+        {
+          console.log(error);
+          return false;
+        }
+      }
+
 }
   
   export default new userExecClass();

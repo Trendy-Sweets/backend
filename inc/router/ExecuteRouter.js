@@ -8,6 +8,7 @@ const rout = [
     // аторизация 
     { method: 'post',   path:'/login',                      handler:WorkExecController.postLogIn },
     { method: 'get',    path: '/logout',                    handler: WorkExecController.getLogout },
+    { method: 'post',   path: '/register',                  handler:WorkExecController.postSignIn},
     // главная
     //{ method: 'get',  path: '/',                        handler: '' }, 
     //{ method: 'post',  path: '/login',                  handler: '' },

@@ -524,6 +524,75 @@ class validFormClass {
         return this.result;
       }
     }
+    
+    async checkOneOrZero(num) {
+        this.result = {};
+      try {
+        // проверяем пустое поле или нет
+        if (num == 1 || num == 0)
+        {
+            this.result.isOk = true;
+            this.result.msg = 'все добре';
+        }
+        else
+        {
+            this.result.isOk = false;
+            this.result.msg = 'Має бути 1 чи 0';
+        }
+
+        
+        return this.result;
+        
+      } catch (error) {
+        console.error(error);
+        this.result.isOk = false;
+        this.result.msg = "Виникла невідома помилка при валідації поля ";
+        return this.result;
+      }
+    }
+
+    
+    async checkYear(num) {
+        this.result = {};
+      try {
+        // проверяем пустое поле или нет
+        if (num === undefined || num === null) {
+            this.result.isOk = false;
+            this.result.msg  = "Поле - порожнє!";
+        }
+        else if (num.trim().lenght === 0)
+        {
+            this.result.isOk = false;
+            this.result.msg  = "Поле  - порожнє!";
+            
+        }
+        else
+        {
+            // разрешено только 18 - 80 диапозон чисел
+            const regex = /^(1[89]|[2-7]\d|80)$/;
+            const isValid = regex.test(num);
+            
+            if (isValid) {
+               
+               this.result.isOk = true;
+               this.result.msg = "Поле  - корректне";
+               
+            } else {
+                this.result.isOk = false;
+                this.result.msg = "Поле містить некорректні символи або виходить за діапазон від 18 до 80";
+              
+            }
+        }
+
+        return this.result;
+        
+      } catch (error) {
+        console.error(error);
+        this.result.isOk = false;
+        this.result.msg = "Виникла невідома помилка при валідації поля";
+        return this.result;
+      }
+    }
   }
   
   export default new validFormClass();
