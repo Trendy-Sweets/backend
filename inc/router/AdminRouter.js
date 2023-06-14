@@ -1,7 +1,6 @@
 import Router from 'express';
 import UserController from '../controller/admin/UserController.js';
 import WorkController from '../controller/admin/WorkController.js';
-import executerClass from '../class/admin/executerClass.js';
 
 
 const routerAdmin = new Router;

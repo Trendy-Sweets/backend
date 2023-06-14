@@ -6,6 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
+    "backloop": "node --experimental-modules backLoop/background.js",
+    "devbackloop": "nodemon --experimental-modules backLoop/background.js",
     "dev": "nodemon index.js"
   },
   "keywords": [],
