@@ -4,7 +4,8 @@ import backLoop from './class/backLoopFunction.js';
 
   const connDB = new pg.Client(config.connDB);
   export { connDB };
-  
+  export {config };
+
   async function startBackgound(){
     try {
       await connDB.connect()
@@ -23,7 +24,7 @@ import backLoop from './class/backLoopFunction.js';
        
         await Promise.all(promisesArray); 
         
-        await new Promise(resolve => setTimeout(resolve, 30000)) // Пауза 1 минута
+        await new Promise(resolve => setTimeout(resolve, 60000)) // Пауза 1 минута
         .then(console.log('1 minutes - IS OVER ...'))
       }
     } catch(err) {
