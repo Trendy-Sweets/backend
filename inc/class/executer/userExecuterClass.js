@@ -179,12 +179,13 @@ class userExecClass {
          let result = {
           error:false,
           errorMSG: '',
-          toReturn: []
+          toReturn: [],
+          countNotEducation: 0,
          };
 
           const sql_products = {
-            text: 'SELECT *  '+
-                  'FROM product ',
+            text: 'SELECT * '+
+                  'FROM product  ORDER by productid ASC',
             values:[]
           };
 
@@ -193,13 +194,55 @@ class userExecClass {
           console.log(temp.rowCount);
           if (temp.rowCount > 0)
           {
+      
+              // получаем список того, чему обучился уже исполнитель
               const sql_education = {
                 text: 'SELECT * FROM know_product WHERE executer_id = $1',
                 values: [executer_id]
               };
 
               const temp_ed = await connDB.query(sql_education);
-              console.log(temp_ed.rowCount);
+              
+              let edu_product = [];
+
+              for (const prod of temp_ed.rows)
+              {
+                  const {
+                    product_id,
+                    ready_todo,
+                  } = prod;
+
+                  let know_temp = {
+                    product_id: product_id,
+                    ready_todo: ready_todo
+                  } 
+
+                  edu_product.push(know_temp);
+              }
+              // формируем общий массив всех проудктов и его статус обучения
+              for (const row of temp.rows) 
+              {
+                  const {
+                    productid,
+                    product_name,
+                    product_foto_small,
+                    product_color,
+                  } = row;
+
+                  const foundProduct = edu_product.find(product => product.product_id === productid);
+
+                  if (!foundProduct) result.countNotEducation += 1;
+
+                  let product_one = {
+                    productid: productid,
+                    product_name: product_name,
+                    product_foto_small: product_foto_small,
+                    product_color: product_color,
+                    know_product: (foundProduct)? true:false,
+                  }
+
+                  result.toReturn.push(product_one);
+              }
           } 
           else
           {

@@ -178,6 +178,7 @@ class WorkExecController {
                 userIdNow: null,
                 userName: null
             },
+            countNotEducation: 0,
             products: []
         };
 
@@ -192,6 +193,18 @@ class WorkExecController {
                 result.okLogin.userName  = status_login.userName;
 
                 const temp = await userExecuterClass.getEducationProductList(result.okLogin.userIdNow);
+
+                if (temp.error)
+                {
+                    result.error = true;
+                    result.errorMSG = temp.errorMSG;
+                }
+                else
+                {
+                    result.products = temp.toReturn;
+                    result.countNotEducation =  temp.countNotEducation;
+                    result.error = false;
+                }
 
             }
             else

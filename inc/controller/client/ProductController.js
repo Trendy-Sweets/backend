@@ -250,9 +250,9 @@ class ProductController {
                             
                             const modifiedToReturn = product_info_rows.toReturn.map(item => {
                                 const count = cartItems[item.productid];
-                                allCartPrice += item.price * count;
+                                allCartPrice += item.price * Number(count);
                                 item.priceOne = item.price;
-                                item.price = item.price*count;
+                                item.price = item.price * Number(count);
                                 countProduct += Number(count);
                                 return { ...item, count };
                             });
