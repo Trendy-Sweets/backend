@@ -84,7 +84,11 @@ class userExecClass {
       async checkAuthorization(cookies) 
       { // проверяем авторизацию по куки ts_executer
 
-        let result = {};
+        let result = {
+          IsLogin: false,
+          userIdNow: null,
+          userName: null
+        };
 
         try {
           if (!cookies.ts_executer) {
@@ -120,7 +124,8 @@ class userExecClass {
       }
 
 
-      async addClientToDB(client_arr) {
+      async addClientToDB(client_arr) 
+      {
         try {
             const { email, phone, fio, password, repassword, addres, anketa_oldwork, anketa_stag, anketa_medkarta, anketa_year, anketa_child } = client_arr;
               // Генерация хэша пароля
@@ -166,6 +171,43 @@ class userExecClass {
           console.log(error);
           return false;
         }
+      }
+
+      // получаме списко ВСЕЗ продуктов и крепим к нему значение полей об обучении конкретного исполнителя
+      async getEducationProductList(executer_id)
+      {
+         let result = {
+          error:false,
+          errorMSG: '',
+          toReturn: []
+         };
+
+          const sql_products = {
+            text: 'SELECT *  '+
+                  'FROM product ',
+            values:[]
+          };
+
+          const temp = await connDB.query(sql_products);
+
+          console.log(temp.rowCount);
+          if (temp.rowCount > 0)
+          {
+              const sql_education = {
+                text: 'SELECT * FROM know_product WHERE executer_id = $1',
+                values: [executer_id]
+              };
+
+              const temp_ed = await connDB.query(sql_education);
+              console.log(temp_ed.rowCount);
+          } 
+          else
+          {
+            result.error = true;
+            result.errorMSG = 'Не має продуктів для навчання';
+          }
+
+          return result;
       }
 
 }

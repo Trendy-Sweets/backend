@@ -253,7 +253,7 @@ class ProductController {
                                 allCartPrice += item.price * count;
                                 item.priceOne = item.price;
                                 item.price = item.price*count;
-                                countProduct += count;
+                                countProduct += Number(count);
                                 return { ...item, count };
                             });
                             

@@ -31,10 +31,10 @@ class BackLoopClass {
 
                     if (timeDelta >= (config.timeOrderNotPayHour * 60 * 60 * 1000)) 
                     {
-                        // Прошло 2 часа или более
+                        // Прошло 2 часа или более 
                         console.log( ' ---------------------------------------------------------------------------\n'+
                                      ' An order (order number - '+order.orderid.toString().padStart(6, '0')+' )\n was found in the "not paid" status,\n'+
-                                     ' the status was set more than '+config.timeOrderNotPay+' hours ago. \n'+
+                                     ' the status was set more than '+config.timeOrderNotPayHour+' hours ago. \n'+
                                      ' We transfer orders to PROBLEM ones for processing by the administrator \n '+
                                      ' ---------------------------------------------------------------------------');
                         // собственно переводим заказа в проблемные с пометкой - проблема в долгой оплате
@@ -56,8 +56,16 @@ class BackLoopClass {
                     }
                 }
                 else
-                {
+                { // заказ оплачен
                     result.payOrderOk += 1;
+
+                    // получаем данные о заказе (о продуктах в заказе)
+
+                    // ищем исполнитеЛЕЙ, котоые готовы принимать заказ, апрувены и умеют делать то что заказали
+
+                    // из найденных - подбираем лучший вариант
+
+                    // переводим заказ на подверждение выбранным кондимтером
                 }
             }
         }

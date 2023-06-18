@@ -166,6 +166,46 @@ class WorkExecController {
             res.status(500).json(error.message);
         }
     }
+
+    // Список товаров для прохождения обучения
+    async getEducationProductList(req, res)
+    {
+        let result = {
+            error: false,
+            errorMSG: '',
+            okLogin: {
+                isLogin: false,
+                userIdNow: null,
+                userName: null
+            },
+            products: []
+        };
+
+        try {
+            // сначала надо проверить авторизацию
+            const status_login = await userExecuterClass.checkAuthorization(req.cookies); 
+
+            if (status_login.IsLogin)
+            {
+                result.okLogin.isLogin   = true;
+                result.okLogin.userIdNow = status_login.userIdNow;
+                result.okLogin.userName  = status_login.userName;
+
+                const temp = await userExecuterClass.getEducationProductList(result.okLogin.userIdNow);
+
+            }
+            else
+            {
+                result.error = true;
+                result.errorMSG = 'Відсутня авторизація. Спершу ввійдіть на сайт під своїм логіном та паролем';
+            }
+
+            res.json(result);
+        }  catch (error) {
+            console.log(error);
+            res.status(500).json(error.message);
+        }
+    }
 }
 
 

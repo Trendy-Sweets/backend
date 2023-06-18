@@ -6,9 +6,11 @@ const routerExecute = new Router;
 
 const rout = [
     // аторизация 
-    { method: 'post',   path:'/login',                      handler:WorkExecController.postLogIn },
+    { method: 'post',   path:'/login',                      handler: WorkExecController.postLogIn },
     { method: 'get',    path: '/logout',                    handler: WorkExecController.getLogout },
-    { method: 'post',   path: '/register',                  handler:WorkExecController.postSignIn},
+    { method: 'post',   path: '/register',                  handler: WorkExecController.postSignIn},
+    // список товарных групп и продуктов в них - для прохождения обучения
+    { method: 'get',    path: '/education/productlist',     handler: WorkExecController.getEducationProductList},
     // главная
     //{ method: 'get',  path: '/',                        handler: '' }, 
     //{ method: 'post',  path: '/login',                  handler: '' },
