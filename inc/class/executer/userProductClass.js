@@ -1,5 +1,156 @@
 import { connDB } from '../../../index.js';
-class productClass {
+
+class userProductClass {
+
+    // получаме списко ВСЕЗ продуктов и крепим к нему значение полей об обучении конкретного исполнителя
+    async getEducationProductList(executer_id)
+    {
+       let result = {
+        error:false,
+        errorMSG: '',
+        toReturn: [],
+        countNotEducation: 0,
+       };
+
+        const sql_products = {
+          text: 'SELECT * '+
+                'FROM product  ORDER by productid ASC',
+          values:[]
+        };
+
+        const temp = await connDB.query(sql_products);
+
+        console.log(temp.rowCount);
+        if (temp.rowCount > 0)
+        {
+    
+            // получаем список того, чему обучился уже исполнитель
+            const sql_education = {
+              text: 'SELECT * FROM know_product WHERE executer_id = $1',
+              values: [executer_id]
+            };
+
+            const temp_ed = await connDB.query(sql_education);
+            
+            let edu_product = [];
+
+            for (const prod of temp_ed.rows)
+            {
+                const {
+                  product_id,
+                  ready_todo,
+                } = prod;
+
+                let know_temp = {
+                  product_id: product_id,
+                  ready_todo: ready_todo
+                } 
+
+                edu_product.push(know_temp);
+            }
+            // формируем общий массив всех проудктов и его статус обучения
+            for (const row of temp.rows) 
+            {
+                const {
+                  productid,
+                  product_name,
+                  product_foto_small,
+                  product_color,
+                } = row;
+
+                const foundProduct = edu_product.find(product => product.product_id === productid);
+
+                if (!foundProduct) result.countNotEducation += 1;
+
+                let product_one = {
+                  productid: productid,
+                  product_name: product_name,
+                  product_foto_small: product_foto_small,
+                  product_color: product_color,
+                  know_product: (foundProduct)? true:false,
+                }
+
+                result.toReturn.push(product_one);
+            }
+        } 
+        else
+        {
+          result.error = true;
+          result.errorMSG = 'Не має продуктів для навчання';
+        }
+
+        return result;
+    }
+
+    // ***** Данные для обучению конкретному продукту *********
+    async getEducationProductInfo(idProduct)
+    {
+        let result = {
+            error:false,
+            errorMSG: '',
+            toReturn: {},
+           };
+
+        try {
+  
+          const query_group = {
+            text:   'SELECT edu.product_id AS product_id, '+
+                    '       edu.composition AS composition, '+
+                    '       edu.formula AS formula, '+
+                    '       pr.product_foto_small AS foto '+
+                    'FROM education_info_product AS edu '+
+                    'LEFT JOIN product AS pr ON edu.product_id = pr.productid '+
+                    'WHERE edu.product_id = $1;',
+            values: [idProduct]
+          };
+          console.log(query_group.text);
+          const temp  = await connDB.query(query_group);
+  
+          if (temp.rowCount > 0 )
+          {
+                result.error = false;
+
+                for (const row of temp.rows)
+                {
+                    const {
+                        product_id: product_id,
+                        foto: foto,
+                        composition: composition,
+                        formula: formula
+                    } = row;
+
+                    result.toReturn = {
+                        product_id: product_id,
+                        foto: foto,
+                        composition: composition,
+                        formula: formula
+                    }
+                }
+          }
+          else
+          {
+            result.error = false;
+            result.toReturn = {
+                product_id: idProduct,
+                foto: '',
+                composition: '',
+                formula: ''
+            }
+          }
+
+          return result;
+         
+        } catch (err) {
+  
+          result.error = true;
+          result.errorMSG = err;
+          return result;
+        }
+      }
+
+
+
+
     async getProductGroup_list() {
       try {
         const query = {
@@ -40,7 +191,7 @@ class productClass {
             productGroupArray = {
               productgroupId: productgroup_id,
               productgroupName: productgroup_name,
-              productgroupFoto: '/pic/' + productgroup_foto,
+              productgroupFoto: '/pic/'+productgroup_foto,
               productgroupMaxTime: productgroup_maxtime,
               productgorupMinPrice: 0,
               products: []
@@ -86,56 +237,7 @@ class productClass {
           };
       }
     }
-  // ***** Данные о конкретной группе продукта *********
-    async getProductGroupInfo(idGroup){
-      try {
-
-        let temp;
-        let result_group = {};
-
-        const query_group = {
-          text: 'SELECT * FROM productgroup_list WHERE productgroup_id = $1;',
-          values: [idGroup],
-          rowMode: 'object'
-        };
-
-        temp  = await connDB.query(query_group);
-
-        if (temp.rowCount == 1)
-        {
-          result_group.msg = "ok";
-          result_group = temp.rows[0];
-
-          const result = {
-            msg:"ok",
-            error: "",
-            toReturn: result_group,
-          }
-          //console.dir(result, { depth: null });
-
-          return result; 
-        }
-        else
-        {
-          const result = {
-            msg:"error",
-            error: "Not exist data",
-            toReturn: result_group,
-          };
-          return result; 
-        }
-       
-      } catch (err) {
-
-        const result = {
-          msg:"error",
-          toReturn: "",
-          error: err,
-        }
-        
-        return result;
-      }
-    }
+    
 
     // ***** данные о конкретнои продукте
     async getProductInfoById(idProduct)
@@ -399,4 +501,4 @@ class productClass {
 
   }
   
-  export default  new productClass();
+  export default  new userProductClass();

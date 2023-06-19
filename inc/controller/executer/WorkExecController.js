@@ -1,5 +1,7 @@
 import userExecuterClass from "../../class/executer/userExecuterClass.js";
+import userProductClass from "../../class/executer/userProductClass.js";
 import validFormClass from "../../class/global/validFormClass.js";
+import config from '../../../config.json' assert { type: "json" };
 
 class WorkExecController {
    
@@ -192,7 +194,7 @@ class WorkExecController {
                 result.okLogin.userIdNow = status_login.userIdNow;
                 result.okLogin.userName  = status_login.userName;
 
-                const temp = await userExecuterClass.getEducationProductList(result.okLogin.userIdNow);
+                const temp = await userProductClass.getEducationProductList(result.okLogin.userIdNow);
 
                 if (temp.error)
                 {
@@ -216,6 +218,64 @@ class WorkExecController {
             res.json(result);
         }  catch (error) {
             console.log(error);
+            res.status(500).json(error.message);
+        }
+    }
+    // страница обучения конкретного продукта
+    async getEducationProductInfo(req, res)
+    {   
+        let result = {
+            error: false,
+            errorMSG: '',
+            okLogin: {
+                isLogin: false,
+                userIdNow: null,
+                userName: null
+            },
+            productId:0,
+            productFoto: '',
+            productComposition:'',
+            productformula:''
+        };
+
+        try
+        {
+            const {idProduct} = req.params;
+            const status_login = await userExecuterClass.checkAuthorization(req.cookies);
+
+            if (status_login.IsLogin)
+            {
+                result.okLogin.isLogin   = true;
+                result.okLogin.userIdNow = status_login.userIdNow;
+                result.okLogin.userName  = status_login.userName;
+
+                const temp = await userProductClass.getEducationProductInfo(Number(idProduct));
+
+                if (temp.error)
+                {
+                    result.error = true;
+                    result.errorMSG = temp.errorMSG;
+                }
+                else
+                {
+                   result.error = false;
+                   result.productComposition = temp.toReturn.composition;
+                   result.productformula     = temp.toReturn.formula;
+                   result.productId          = Number(idProduct);
+                   result.productFoto        = config.imgProdURL + temp.toReturn.foto;
+                }
+
+            }
+            else
+            {
+                result.error = true;
+                result.errorMSG = 'Відсутня авторизація. Спершу ввійдіть на сайт під своїм логіном та паролем';
+            }
+
+            res.json(result);
+        }
+        catch(error)
+        {
             res.status(500).json(error.message);
         }
     }

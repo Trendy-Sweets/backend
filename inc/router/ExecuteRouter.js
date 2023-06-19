@@ -11,6 +11,8 @@ const rout = [
     { method: 'post',   path: '/register',                  handler: WorkExecController.postSignIn},
     // список товарных групп и продуктов в них - для прохождения обучения
     { method: 'get',    path: '/education/productlist',     handler: WorkExecController.getEducationProductList},
+    // страница обучения конкретного продукта
+    { method: 'get',    path: '/education/processing/:idProduct', handler: WorkExecController.getEducationProductInfo},
     // главная
     //{ method: 'get',  path: '/',                        handler: '' }, 
     //{ method: 'post',  path: '/login',                  handler: '' },
