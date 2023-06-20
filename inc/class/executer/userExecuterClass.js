@@ -173,6 +173,54 @@ class userExecClass {
         }
       }
 
+    // оплучаем все данные об исполнителе
+    async getExecuterInfo(idExecuter) {
+
+      let result = {
+        error: false,
+        errorMSG: '',
+        toReturn:{}
+      }
+      try {
+          // достаем из БД данные по указанной почте
+          const query = {
+            text: 'SELECT * FROM executer WHERE executer_id = $1',
+            values: [idExecuter]
+          };
+
+          const temp = await connDB.query(query);
+
+          if (temp.rowCount == 0)
+          {
+            result.error = true;
+            result.errorMSG = 'Не знайдено зазначеного виконавця';
+          }
+          else
+          {
+              const {
+                executer_id,
+                email,
+                fio,
+                phone,
+                allowed,
+                ready,
+                addres,
+              } = temp.rows[0];
+
+              result.error = false;
+              result.toReturn = {
+                name:fio,
+                allowed:(allowed == 1)? true: false,
+                ready: (ready == 1)? true: false
+              }
+          }
+          return result;
+      } catch (error) {
+        result.error = true;
+        result.errorMSG = error;
+        return result;
+      }
+    }
 }
   
   export default new userExecClass();

@@ -16,7 +16,7 @@ const rout = [
     // нажатие на кнопку "завершить обучение" для конкретного продукта
     { method: 'post',   path: '/education/complete',        handler:WorkExecController.postEducationProductComplete},
     // главная
-    //{ method: 'get',  path: '/',                        handler: '' }, 
+    { method: 'get',  path: '/',                            handler: WorkExecController.getMainExecuterPage }, 
     //{ method: 'post',  path: '/login',                  handler: '' },
     //{ method: 'get', path: '/logout',                   handler: '' },
      ];

@@ -5,6 +5,87 @@ import config from '../../../config.json' assert { type: "json" };
 
 class WorkExecController {
    
+    // инфа для главной страницы
+    async getMainExecuterPage(req,res) {
+        let result = {
+            error: false,
+            errorMSG: '',
+            okLogin: {
+                isLogin: false,
+                userIdNow: null,
+                userName: null
+            },
+            name: '',
+            allowed: false,
+            ready: false,
+            orderToDo:{
+                orderId:0,
+                orderDateDelivery: '22-06-2023 11:00',
+                products: [
+                    {
+                    productid: 13,
+                    name: "Зефір трояндовий",
+                    foto: "/pic/zefir_rose_small.png",
+                    count: 1},
+                ],
+                orderMaxTime:72,
+                orderTimeLeft: 36,
+            },
+        };
+
+        try
+        {
+            const status_login = await userExecuterClass.checkAuthorization(req.cookies);
+
+            if (status_login.IsLogin)
+            {
+                result.okLogin.isLogin   = true;
+                result.okLogin.userIdNow = status_login.userIdNow;
+                result.okLogin.userName  = status_login.userName;
+
+                // ok аовризация есть - что дальше?
+                // 1 - надо получить все данные об исполнителе из БД (в частности статусы допущен и готов)
+                // 2 - получить данные о наличии заказов на ожидании / выполнении у исполнителя
+                const temp = await userExecuterClass.getExecuterInfo(status_login.userIdNow);
+                if (temp.error)
+                {
+                    result.error = true;
+                    result.errorMSG = temp.errorMSG;
+                }
+                else
+                {
+                   result.error     = false;
+                   result.allowed   = temp.toReturn.allowed;
+                   result.ready     = temp.toReturn.ready;
+                   result.name      = temp.toReturn.name;
+
+                    if (result.allowed)
+                    {
+                        // надо получить данные о заказ которые ждут подтверждение или выоплняются
+                    }
+                    else
+                    {
+                        result.orderToDo = 'Ви не можете приймати замовлення';
+                    }
+
+                }
+
+            }
+            else
+            {
+                result.error = true;
+                result.errorMSG = 'Відсутня авторизація. Спершу ввійдіть на сайт під своїм логіном та паролем';
+            }
+
+            res.json(result);
+        }
+        catch(error)
+        {
+            res.status(500).json(error.message);
+        }
+    }
+
+
     // аторизация
     async postLogIn(req, res) {
 
