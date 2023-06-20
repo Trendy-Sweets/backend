@@ -15,8 +15,8 @@ class OrderController {
     async getAddFormInfo(req, res) {
 
         const status_login = await clientClass.checkAuthorization(req.cookies); // Проверка авторизации 
+
         let result = {
-            products:'',
             allCartPrice:0,
             beforTAXFree:0,
             error:false,
@@ -24,7 +24,8 @@ class OrderController {
             client: {
                 IsLogin: status_login.IsLogin,
                 clientId: status_login.userIdNow,
-                clientName: status_login.userName
+                clientName: status_login.userName,
+                clientEmail: '',
             },
             region: {
                 region_code: [config.default_params.region],
@@ -34,51 +35,60 @@ class OrderController {
                 city_code: [config.default_params.city],
                 city_name: [city_list.DP.DP],
             }, 
+            products:[],
             
         };
 
         try {
-            
-            const temp = await validFormClass.validCookieCart(req.cookies.cart);
-            if (temp.isOk)
-            { // с кукой все ок
-                // значит все ключи - цифры // уже ок - можно передавать на обработку
-                const cartItems = await JSON.parse(req.cookies.cart);
-                // получаем инфу о продуктах
-                const id_list = Object.keys(cartItems);
-                let product_info_rows = await productClass.getProductListByListId(id_list);
 
-                if (!product_info_rows.error)
-                {
-                    let allCartPrice = 0;
-                    const modifiedToReturn = product_info_rows.toReturn.map(item => {
-                        const count = cartItems[item.productid];
-                        allCartPrice += item.price * count;
-                        return { ...item, count };
-                    });
-                    
-                    result.products     = modifiedToReturn;
-                    result.allCartPrice = allCartPrice;
-                    result.beforTAXFree =  (config.freeTAX - allCartPrice)<0? 0:(config.freeTAX - allCartPrice);
-                    result.error = false;
-                    result.client = {
-                        IsLogin: status_login.IsLogin,
-                        clientId: status_login.userIdNow,
-                        clientName: status_login.userName
-                    };
+            // надо получить почту клиента
+            const clientDB = await clientClass.getClienbtInfo(status_login.userIdNow);
 
+            if (clientDB.error)
+            {
+                result.error = true;
+                result.msgError = clientDB.errorMSG;
+            }
+            else
+            {
+                result.client.clientEmail = clientDB.toReturn.email;
+                const temp = await validFormClass.validCookieCart(req.cookies.cart);
+                if (temp.isOk)
+                { // с кукой все ок
+                    // значит все ключи - цифры // уже ок - можно передавать на обработку
+                    const cartItems = await JSON.parse(req.cookies.cart);
+                    // получаем инфу о продуктах
+                    const id_list = Object.keys(cartItems);
+                    let product_info_rows = await productClass.getProductListByListId(id_list);
+
+                    if (!product_info_rows.error)
+                    {
+                        let allCartPrice = 0;
+                        const modifiedToReturn = product_info_rows.toReturn.map(item => {
+                            const count = cartItems[item.productid];
+                            allCartPrice += item.price * count;
+                            return { ...item, count };
+                        });
+                        
+                        result.products     = modifiedToReturn;
+                        result.allCartPrice = allCartPrice;
+                        result.beforTAXFree =  (config.freeTAX - allCartPrice)<0? 0:(config.freeTAX - allCartPrice);
+                        result.error = false;
+
+                    }
+                    else
+                    {
+                        result.error = true;
+                        result.msgError = product_info_rows.msg;
+                    }
                 }
                 else
                 {
                     result.error = true;
-                    result.msgError = product_info_rows.msg;
+                    result.msgError = temp.msg;
                 }
             }
-            else
-            {
-                result.error = true;
-                result.msgError = temp.msg;
-            }
+            
             res.json(result);
 
         } catch (error) {

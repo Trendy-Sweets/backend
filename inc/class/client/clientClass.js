@@ -183,6 +183,59 @@ class clientClass {
         return false;
       }
     }
+
+    // загрузка данных о клиенте с БД
+    async getClienbtInfo(idClient)
+    {
+      let result = {
+        error: false,
+        errorMSG: '',
+        toReturn: {}
+      }
+      try
+      {
+        const sql_select = {
+          text: 'SELECT * FROM client WHERE clientid = $1',
+          values: [idClient]
+        };
+
+        const temp = await connDB.query(sql_select);
+
+        if (temp.rowCount > 0)
+        {
+            result.error = false;
+            const row = temp.rows[0];
+
+            const {
+              email,
+              confirm,
+              date_register,
+              name,
+              date_lastvisit
+            } = row;
+
+            result.toReturn = {
+              email: email,
+              name: name
+            }
+
+        }
+        else
+        {
+          result.error = true;
+          result.errorMSG = 'клієнта не знайдено в БД або інша проблема';
+        }
+
+        return result;
+      }
+      catch(err)
+      {
+        result.error = true;
+        result.errorMSG = err;
+        return result;
+      }
+
+    }
 }
   
   export default new clientClass();
