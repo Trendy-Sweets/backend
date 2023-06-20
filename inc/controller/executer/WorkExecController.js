@@ -67,9 +67,7 @@ class WorkExecController {
                     {
                         result.orderToDo = 'Ви не можете приймати замовлення';
                     }
-
                 }
-
             }
             else
             {
