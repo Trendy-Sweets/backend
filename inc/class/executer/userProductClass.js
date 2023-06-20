@@ -103,7 +103,7 @@ class userProductClass {
                     'WHERE edu.product_id = $1;',
             values: [idProduct]
           };
-          console.log(query_group.text);
+          //console.log(query_group.text);
           const temp  = await connDB.query(query_group);
   
           if (temp.rowCount > 0 )
@@ -147,6 +147,54 @@ class userProductClass {
           return result;
         }
       }
+
+    // Добавляем запись о прошедшем обучении исполнителем определеного продукта
+    async addEducationProductComplete(idProduct, idExecuter)
+    {
+        let result = {
+            error:false,
+            errorMSG: '',
+            toReturn: '',
+           };
+        try
+        {
+            const sql_insert = {
+                text: 'INSERT INTO know_product (executer_id, product_id, ready_todo) '+
+                      'VALUES ($2, $1, $3)',
+                values: [idProduct, idExecuter, 0]
+            };
+
+            const temp = await connDB.query(sql_insert);
+
+            if (temp.rowCount > 0)
+            {
+                result.error = false;
+                result.errorMSG = '';
+                result.toReturn = 'Навчання зафіксовано.';
+            }
+            else
+            {
+                result.error = true;
+                result.errorMSG = 'Виникла помилка при спробі зафіксувати проходження навчання';
+            }
+
+            return result;
+        }
+        catch(error)
+        {
+            console.log(error);
+            result.error = true;
+            result.errorMSG = 'ERROR IN SQL !!!';//error;
+            return result;
+        }
+    }
+
+
+
+
+
+
+
 
 
 

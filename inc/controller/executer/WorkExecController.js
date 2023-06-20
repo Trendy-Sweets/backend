@@ -279,6 +279,59 @@ class WorkExecController {
             res.status(500).json(error.message);
         }
     }
+
+    // прошел обучение по определенному продукту
+    async postEducationProductComplete(req, res)
+    {   
+        let result = {
+            error: false,
+            errorMSG: '',
+            resultMSG: '',
+            okLogin: {
+                isLogin: false,
+                userIdNow: null,
+                userName: null
+            }
+        };
+
+        try
+        {
+            const {idProduct} = req.body;
+            const status_login = await userExecuterClass.checkAuthorization(req.cookies);
+
+            if (status_login.IsLogin)
+            {
+                result.okLogin.isLogin   = true;
+                result.okLogin.userIdNow = status_login.userIdNow;
+                result.okLogin.userName  = status_login.userName;
+
+                const temp = await userProductClass.addEducationProductComplete(Number(idProduct), result.okLogin.userIdNow);
+
+                if (temp.error)
+                {
+                    result.error = true;
+                    result.errorMSG = temp.errorMSG;
+                }
+                else
+                {
+                    result.error = false;
+                    result.resultMSG = temp.toReturn;
+                }
+
+            }
+            else
+            {
+                result.error = true;
+                result.errorMSG = 'Відсутня авторизація. Спершу ввійдіть на сайт під своїм логіном та паролем';
+            }
+
+            res.json(result);
+        }
+        catch(error)
+        {
+            res.status(500).json(error.message);
+        }
+    }
 }
 
 

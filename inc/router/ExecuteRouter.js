@@ -13,6 +13,8 @@ const rout = [
     { method: 'get',    path: '/education/productlist',     handler: WorkExecController.getEducationProductList},
     // страница обучения конкретного продукта
     { method: 'get',    path: '/education/processing/:idProduct', handler: WorkExecController.getEducationProductInfo},
+    // нажатие на кнопку "завершить обучение" для конкретного продукта
+    { method: 'post',   path: '/education/complete',        handler:WorkExecController.postEducationProductComplete},
     // главная
     //{ method: 'get',  path: '/',                        handler: '' }, 
     //{ method: 'post',  path: '/login',                  handler: '' },
